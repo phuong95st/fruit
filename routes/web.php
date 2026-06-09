@@ -79,3 +79,31 @@ Route::get('/sitemap.xml', function () {
         'Content-Type' => 'application/xml; charset=utf-8'
     ]);
 });
+
+use App\Http\Controllers\Admin\AdminController;
+
+// Admin Panel Routes
+Route::prefix('admin')->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
+    
+    Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
+    Route::get('/orders/{id}', [AdminController::class, 'orderDetail'])->name('admin.orders.detail');
+    
+    Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
+    Route::get('/products/create', [AdminController::class, 'productCreate'])->name('admin.products.create');
+    Route::post('/products', [AdminController::class, 'productStore'])->name('admin.products.store');
+    Route::get('/products/{id}', [AdminController::class, 'productDetail'])->name('admin.products.detail');
+    
+    Route::get('/inventory', [AdminController::class, 'inventory'])->name('admin.inventory');
+    Route::get('/inventory/stock-in', [AdminController::class, 'stockIn'])->name('admin.inventory.stock-in');
+    Route::post('/inventory/stock-in', [AdminController::class, 'stockInStore'])->name('admin.inventory.stock-in.store');
+    
+    Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers');
+    Route::get('/customers/{id}', [AdminController::class, 'customerDetail'])->name('admin.customers.detail');
+    
+    Route::get('/vouchers', [AdminController::class, 'vouchers'])->name('admin.vouchers');
+    Route::post('/vouchers', [AdminController::class, 'voucherStore'])->name('admin.vouchers.store');
+    
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+});
