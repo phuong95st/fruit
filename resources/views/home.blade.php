@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'FruitNest — Hoa Quả Tươi Ngon Mỗi Ngày | Trang Chủ')
+@section('title', 'Hoa quả Sơn Tây — Hoa Quả Tươi Ngon Mỗi Ngày | Trang Chủ')
 
 @section('content')
 <div class="page active" id="page-home">
@@ -9,7 +9,7 @@
   <!-- Hero -->
   <div class="hero-banner">
     <div class="hero-text">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.6);margin-bottom:5px;">Giao hàng tận nơi tại TP.HCM</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.6);margin-bottom:5px;">Giao hàng tận nơi tại Hà Nội & Sơn Tây</div>
       <h1>Hoa quả <span>tươi ngon</span> mỗi ngày</h1>
       <p>Trái cây tươi nhập khẩu và nội địa, tuyển chọn kỹ lưỡng. Giao trong 2 giờ — đảm bảo tươi ngon hoặc hoàn tiền 100%.</p>
       <div class="hero-btns">
@@ -70,6 +70,29 @@
 
     <!-- Main content -->
     <div>
+      <!-- Hôm nay bán gì? -->
+      <div class="section-block" style="background: rgba(76, 175, 128, 0.05); border: 1px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+        <div class="section-head">
+          <div class="section-head-title" style="color: var(--accent); display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.5rem;">🧺</span> Hôm nay bán gì?
+          </div>
+          <span style="font-size: 0.85rem; color: var(--text-3); font-weight: 500; background: var(--white); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.05);">Tuyển chọn hái tươi mỗi ngày</span>
+        </div>
+        <div class="section-body" style="margin-top: 15px;">
+          @if($dailyProducts->count() > 0)
+            <div class="grid-5" id="home-daily">
+              @foreach($dailyProducts as $product)
+                @include('partials.product-card', ['product' => $product])
+              @endforeach
+            </div>
+          @else
+            <div style="text-align: center; padding: 30px; color: var(--text-3); font-style: italic;">
+              Hôm nay vườn đang thu hoạch, quản trị viên sẽ cập nhật sản phẩm sớm nhất!
+            </div>
+          @endif
+        </div>
+      </div>
+
       <!-- Nổi bật -->
       <div class="section-block">
         <div class="section-head">

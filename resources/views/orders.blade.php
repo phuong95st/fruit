@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Đơn Hàng Của Tôi | FruitNest')
+@section('title', 'Đơn Hàng Của Tôi | Hoa quả Sơn Tây')
 
 @section('content')
 <div class="page active" id="page-orders">
@@ -14,10 +14,19 @@
   <div class="account-layout">
     <!-- Sidebar Account Info -->
     <aside class="acc-sidebar">
+      @php
+        $customerName = 'Nguyễn Thị Hương';
+        $customerContact = 'huong@email.com';
+        if (session('last_order')) {
+            $lastOrder = session('last_order');
+            $customerName = $lastOrder['fullname'];
+            $customerContact = $lastOrder['phone'];
+        }
+      @endphp
       <div class="acc-profile">
         <div class="acc-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-        <div class="acc-name">Nguyễn Thị Hương</div>
-        <div class="acc-email">huong@email.com</div>
+        <div class="acc-name">{{ $customerName }}</div>
+        <div class="acc-email">{{ $customerContact }}</div>
       </div>
       <ul class="acc-menu">
         <li><a class="on"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Đơn hàng của tôi</a></li>
@@ -43,85 +52,80 @@
       </div>
       
       <div id="orders-list-container">
-        <!-- 1. Hiển thị đơn hàng vừa đặt trong session nếu có -->
-        @if(session('last_order'))
-          @php $lastOrder = session('last_order'); @endphp
-          <div class="order-card active-order" data-status="pending" onclick="window.location.href='{{ route('checkout.success') }}'">
-            <div class="order-card-head">
-              <div>
-                <div class="order-id">#{{ $lastOrder['id'] }}</div>
-                <div class="order-date">{{ $lastOrder['date'] }}</div>
-              </div>
-              <span class="status-pill sp-proc">Đang chuẩn bị</span>
-            </div>
-            <div class="order-card-body">
-              <div class="order-thumbs">
-                @foreach($lastOrder['items'] as $item)
-                  <div class="order-thumb" title="{{ $item['name'] }}">
-                    <div class="fruit-ico {{ $item['ic'] }}"><svg viewBox="0 0 24 24">{!! $item['svg'] !!}</svg></div>
-                  </div>
-                @endforeach
-              </div>
-              <span style="font-size:var(--fs-xs);color:var(--n500);margin-left:8px;">{{ count($lastOrder['items']) }} sản phẩm</span>
-            </div>
-            <div class="order-card-foot">
-              <div class="order-total-txt">Tổng: <span class="order-total-val">{{ number_format($lastOrder['total'], 0, ',', '.') }}đ</span></div>
-              <div class="order-foot-btns">
-                <button class="btn btn-outline btn-sm">Hỗ trợ</button>
-                <button class="btn btn-primary btn-sm">Theo dõi</button>
-              </div>
-            </div>
+        @if($orders->isEmpty())
+          <div style="text-align: center; padding: 40px 20px; color: var(--n500);">
+            <svg viewBox="0 0 24 24" style="width: 48px; height: 48px; stroke: currentColor; fill: none; stroke-width: 1.5; margin-bottom: 12px; color: var(--n300); display: inline-block;">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <p style="font-size: var(--fs-md); font-weight: 600; margin-bottom: 8px;">Bạn chưa có đơn hàng nào</p>
+            <p style="font-size: var(--fs-sm); color: var(--n400); margin-bottom: 16px;">Hãy khám phá những mặt hàng tươi ngon của cửa hàng nhé.</p>
+            <a href="{{ route('shop.index') }}" class="btn btn-primary btn-sm">Mua sắm ngay</a>
           </div>
+        @else
+          @foreach($orders as $order)
+            @php
+              $status = $order->status;
+              $statusClass = 'sp-pend';
+              if ($status === 'Chờ xử lý') {
+                  $statusClass = 'sp-pend';
+              } elseif ($status === 'Chuẩn bị' || $status === 'Chuẩn bị hàng') {
+                  $statusClass = 'sp-proc';
+              } elseif ($status === 'Đang giao' || $status === 'Đang giao hàng') {
+                  $statusClass = 'sp-ship';
+              } elseif ($status === 'Hoàn thành' || $status === 'Đã giao') {
+                  $statusClass = 'sp-done';
+              } elseif ($status === 'Đã hủy' || $status === 'Hoàn hàng') {
+                  $statusClass = 'sp-cancel';
+              }
+
+              $dataStatus = 'pending';
+              if ($status === 'Đang giao' || $status === 'Đang giao hàng') {
+                  $dataStatus = 'shipping';
+              } elseif ($status === 'Hoàn thành' || $status === 'Đã giao') {
+                  $dataStatus = 'done';
+              }
+            @endphp
+            <div class="order-card" data-status="{{ $dataStatus }}" onclick="window.location.href='{{ route('page.orders.detail', $order->id) }}'" style="cursor: pointer;">
+              <div class="order-card-head">
+                <div>
+                  <div class="order-id">#{{ $order->order_code }}</div>
+                  <div class="order-date">{{ $order->created_at->format('d/m/Y H:i') }}</div>
+                </div>
+                <span class="status-pill {{ $statusClass }}">
+                  @if($status === 'Chuẩn bị') Đang chuẩn bị @else {{ $status }} @endif
+                </span>
+              </div>
+              <div class="order-card-body">
+                <div class="order-thumbs">
+                  @foreach($order->items as $item)
+                    <div class="order-thumb" title="{{ $item->product_name }}">
+                      @if($item->product && $item->product->image_url)
+                        <img src="{{ $item->product->image_url }}" alt="{{ $item->product_name }}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;">
+                      @elseif($item->product && $item->product->svg)
+                        <div class="fruit-ico {{ $item->product->ic }}"><svg viewBox="0 0 24 24">{!! $item->product->svg !!}</svg></div>
+                      @else
+                        🍊
+                      @endif
+                    </div>
+                  @endforeach
+                </div>
+                <span style="font-size:var(--fs-xs);color:var(--n500);margin-left:8px;">{{ count($order->items) }} sản phẩm</span>
+              </div>
+              <div class="order-card-foot">
+                <div class="order-total-txt">Tổng: <span class="order-total-val">{{ number_format($order->total_price, 0, ',', '.') }}đ</span></div>
+                <div class="order-foot-btns">
+                  <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); window.location.href='{{ route('page.orders.detail', $order->id) }}'">Chi tiết</button>
+                  @if($status === 'Hoàn thành' || $status === 'Đã giao')
+                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); alert('Đã thêm các mặt hàng vào lại giỏ hàng.');">Mua lại</button>
+                  @else
+                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); window.location.href='{{ route('page.orders.detail', $order->id) }}'">Theo dõi</button>
+                  @endif
+                </div>
+              </div>
+            </div>
+          @endforeach
         @endif
-
-        <!-- 2. Danh sách các đơn hàng mock tĩnh giống HTML theme cũ -->
-        <div class="order-card" data-status="done">
-          <div class="order-card-head">
-            <div>
-              <div class="order-id">#FN-2026-08098</div>
-              <div class="order-date">Hôm qua, 09:15</div>
-            </div>
-            <span class="status-pill sp-done">Đã giao</span>
-          </div>
-          <div class="order-card-body">
-            <div class="order-thumbs">
-              <div class="order-thumb" title="Nho đen"><div class="fruit-ico fi-p"><svg viewBox="0 0 24 24"><circle cx="9" cy="14" r="3"/><circle cx="15" cy="14" r="3"/><circle cx="12" cy="9" r="3"/></svg></div></div>
-              <div class="order-thumb" title="Kiwi xanh"><div class="fruit-ico fi-g"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="7"/></svg></div></div>
-            </div>
-            <span style="font-size:var(--fs-xs);color:var(--n500);margin-left:8px;">2 sản phẩm</span>
-          </div>
-          <div class="order-card-foot">
-            <div class="order-total-txt">Tổng: <span class="order-total-val">195.000đ</span></div>
-            <div class="order-foot-btns">
-              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); alert('Cảm ơn bạn đã đánh giá!');">Đánh giá</button>
-              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); alert('Đã thêm sản phẩm đơn hàng này vào lại giỏ hàng.');">Mua lại</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="order-card" data-status="done">
-          <div class="order-card-head">
-            <div>
-              <div class="order-id">#FN-2026-07941</div>
-              <div class="order-date">05/06/2026</div>
-            </div>
-            <span class="status-pill sp-done">Đã giao</span>
-          </div>
-          <div class="order-card-body">
-            <div class="order-thumbs">
-              <div class="order-thumb" title="Giỏ quà"><div class="fruit-ico fi-y"><svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/></svg></div></div>
-            </div>
-            <span style="font-size:var(--fs-xs);color:var(--n500);margin-left:8px;">1 sản phẩm · Giỏ quà</span>
-          </div>
-          <div class="order-card-foot">
-            <div class="order-total-txt">Tổng: <span class="order-total-val">450.000đ</span></div>
-            <div class="order-foot-btns">
-              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); alert('Cảm ơn bạn đã đánh giá!');">Đánh giá</button>
-              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); alert('Đã thêm sản phẩm đơn hàng này vào lại giỏ hàng.');">Mua lại</button>
-            </div>
-          </div>
-        </div>
-      </div>
       
     </div>
   </div>

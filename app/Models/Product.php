@@ -29,6 +29,8 @@ class Product extends Model
         'reviews_count',
         'sold_count',
         'nutrition',
+        'is_daily',
+        'image',
     ];
 
     /**
@@ -60,6 +62,20 @@ class Product extends Model
     }
 
     /**
+     * Lấy URL ảnh sản phẩm từ MinIO S3 hoặc fallback
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+                return $this->image;
+            }
+            return rtrim(config('filesystems.disks.s3.url'), '/') . '/' . ltrim($this->image, '/');
+        }
+        return null;
+    }
+
+    /**
      * Sinh dữ liệu cấu trúc JSON-LD chuẩn SEO cho AI & Google Search
      */
     public function toJsonLd()
@@ -79,7 +95,7 @@ class Product extends Model
                 'availability' => 'https://schema.org/InStock',
                 'seller' => [
                     '@type' => 'Store',
-                    'name' => 'FruitNest'
+                    'name' => 'Hoa quả Sơn Tây'
                 ]
             ]
         ];

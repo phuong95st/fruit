@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Cửa Hàng Trái Cây Sạch | FruitNest')
+@section('title', 'Cửa Hàng Trái Cây Sạch | Hoa quả Sơn Tây')
 
 @section('content')
 <div class="page active" id="page-shop">

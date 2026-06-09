@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Liên Hệ Hỗ Trợ | FruitNest')
-@section('meta_description', 'Liên hệ với FruitNest qua hotline 0909 123 456 hoặc điền form gửi tin nhắn hỗ trợ trực tiếp. Chúng tôi sẽ phản hồi trong 2 giờ.')
+@section('title', 'Liên Hệ Hỗ Trợ | Hoa quả Sơn Tây')
+@section('meta_description', 'Liên hệ với Hoa quả Sơn Tây qua hotline 0909 123 456 hoặc điền form gửi tin nhắn hỗ trợ trực tiếp. Chúng tôi sẽ phản hồi trong 2 giờ.')
 
 @section('content')
 <div class="page active">
@@ -34,14 +34,14 @@
         <div class="contact-item">
           <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           <div class="contact-item-title">Email</div>
-          <div class="contact-item-val">hello@fruitnest.vn</div>
+          <div class="contact-item-val">hello@hoaquasontay.vn</div>
           <div class="contact-item-sub">Phản hồi trong 2 giờ</div>
         </div>
         <div class="contact-item">
           <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           <div class="contact-item-title">Địa chỉ</div>
-          <div class="contact-item-val">123 Nguyễn Văn Linh</div>
-          <div class="contact-item-sub">Quận 7, TP.HCM</div>
+          <div class="contact-item-val">Thị xã Sơn Tây</div>
+          <div class="contact-item-sub">Sơn Tây, Hà Nội</div>
         </div>
       </div>
       

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Dịch Vụ Đặc Biệt | Lễ Tết · Tâm Linh · Sự Kiện | FruitNest')
-@section('meta_description', 'FruitNest cung cấp dịch vụ đặt làm giỏ quà, mâm quả, đĩa quả thắp hương, mâm lễ chùa, cưới hỏi theo yêu cầu riêng và khoảng giá.')
+@section('title', 'Dịch Vụ Đặc Biệt | Lễ Tết · Tâm Linh · Sự Kiện | Hoa quả Sơn Tây')
+@section('meta_description', 'Hoa quả Sơn Tây cung cấp dịch vụ đặt làm giỏ quà, mâm quả, đĩa quả thắp hương, mâm lễ chùa, cưới hỏi theo yêu cầu riêng và khoảng giá.')
 
 @section('content')
 <div class="page active" id="page-services">
@@ -148,7 +148,7 @@
         <span>2. Trái cây trong giỏ có đảm bảo tươi ngon và đúng cam kết không?</span>
         <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="faq-a">FruitNest cam kết 100% trái cây được đóng giỏ là trái cây tươi ngon tuyển chọn trong ngày. Nếu khách hàng phát hiện trái cây hỏng, dập úng, chúng tôi cam kết hoàn tiền 100% hoặc đổi mới ngay lập tức.</div>
+      <div class="faq-a">Hoa quả Sơn Tây cam kết 100% trái cây được đóng giỏ là trái cây tươi ngon tuyển chọn trong ngày. Nếu khách hàng phát hiện trái cây hỏng, dập úng, chúng tôi cam kết hoàn tiền 100% hoặc đổi mới ngay lập tức.</div>
     </div>
     
     <div class="faq-item">

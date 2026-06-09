@@ -35,6 +35,8 @@ return new class extends Migration
             $table->integer('reviews_count')->default(0);
             $table->integer('sold_count')->default(0);
             $table->text('nutrition')->nullable();
+            $table->boolean('is_daily')->default(false);
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

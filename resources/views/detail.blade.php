@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' — FruitNest')
-@section('meta_description', $product->desc ?: 'Mua ' . $product->name . ' tươi ngon mọng nước tại FruitNest. Cam kết sạch, giao nhanh trong 2 giờ.')
+@section('title', $product->name . ' — Hoa quả Sơn Tây')
+@section('meta_description', $product->desc ?: 'Mua ' . $product->name . ' tươi ngon mọng nước tại Hoa quả Sơn Tây. Cam kết sạch, giao nhanh trong ngày.')
 @section('meta_keywords', $product->name . ', ' . $product->origin . ', trái cây sạch, hoa quả sạch')
 
 @section('schema')
@@ -24,20 +24,39 @@
   <div style="display:grid;gap:10px;" class="detail-layout">
     <!-- Left Column: Images -->
     <div>
-      <div class="detail-img-main {{ $product->bg }}" id="det-main">
-        <div class="fruit-ico {{ $product->ic }}" id="det-icon">
-          <svg viewBox="0 0 24 24">{!! $product->svg !!}</svg>
-        </div>
+      <div class="detail-img-main {{ $product->image_url ? '' : $product->bg }}" id="det-main">
+        @if($product->image_url)
+          <img src="{{ $product->image_url }}" alt="{{ $product->name }}" id="det-main-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
+        @else
+          <div class="fruit-ico {{ $product->ic }}" id="det-icon">
+            <svg viewBox="0 0 24 24">{!! $product->svg !!}</svg>
+          </div>
+        @endif
       </div>
       <div class="detail-thumbs">
-        <div class="detail-thumb on" onclick="selectThumb(this, '{{ $product->bg }}')">
-          <div class="fruit-ico {{ $product->ic }}"><svg viewBox="0 0 24 24">{!! $product->svg !!}</svg></div>
+        @if($product->image_url)
+          <div class="detail-thumb on" onclick="selectThumb(this, 'image')">
+            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
+          </div>
+        @else
+          <div class="detail-thumb on" onclick="selectThumb(this, 'icon', '{{ $product->bg }}')">
+            <div class="fruit-ico {{ $product->ic }}"><svg viewBox="0 0 24 24">{!! $product->svg !!}</svg></div>
+          </div>
+        @endif
+        
+        <div class="detail-thumb" onclick="selectThumb(this, 'mock1', 'bg-g')">
+          @if($product->image_url)
+            <img src="{{ $product->image_url }}" alt="Sub Image 1" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.7; border-radius: inherit;">
+          @else
+            <div class="fruit-ico fi-g" style="background:var(--n50)"><svg viewBox="0 0 24 24"><path d="M12 22s8-6 8-12A8 8 0 004 10c0 6 8 12 8 12z"/></svg></div>
+          @endif
         </div>
-        <div class="detail-thumb" onclick="selectThumb(this, 'bg-g')">
-          <div class="fruit-ico fi-g" style="background:var(--n50)"><svg viewBox="0 0 24 24"><path d="M12 22s8-6 8-12A8 8 0 004 10c0 6 8 12 8 12z"/></svg></div>
-        </div>
-        <div class="detail-thumb" onclick="selectThumb(this, 'bg-g')">
-          <div class="fruit-ico fi-g" style="background:#f0f8f0"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/></svg></div>
+        <div class="detail-thumb" onclick="selectThumb(this, 'mock2', 'bg-g')">
+          @if($product->image_url)
+            <img src="{{ $product->image_url }}" alt="Sub Image 2" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5; border-radius: inherit;">
+          @else
+            <div class="fruit-ico fi-g" style="background:#f0f8f0"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/></svg></div>
+          @endif
         </div>
       </div>
     </div>
@@ -152,13 +171,27 @@
         document.getElementById('qtyNum').textContent = curQty;
     }
     
-    function selectThumb(thumb, bgClass) {
+    function selectThumb(thumb, type, bgClass) {
         document.querySelectorAll('.detail-thumb').forEach(t => t.classList.remove('on'));
         thumb.classList.add('on');
         
-        // Cập nhật background cho ảnh chính dựa vào class ảnh nhỏ
         const main = document.getElementById('det-main');
-        main.className = 'detail-img-main ' + bgClass;
+        const img = document.getElementById('det-main-img');
+        const icon = document.getElementById('det-icon');
+        
+        if (type === 'image') {
+            if (img) img.style.opacity = '1';
+            main.className = 'detail-img-main';
+        } else if (type === 'mock1') {
+            if (img) img.style.opacity = '0.7';
+            main.className = 'detail-img-main';
+        } else if (type === 'mock2') {
+            if (img) img.style.opacity = '0.5';
+            main.className = 'detail-img-main';
+        } else {
+            if (img) img.style.opacity = '0';
+            main.className = 'detail-img-main ' + bgClass;
+        }
     }
     
     function switchTab(btn, tabId) {

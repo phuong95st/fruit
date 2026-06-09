@@ -36,6 +36,7 @@ Route::get('/lien-he', [StaticPageController::class, 'contact'])->name('page.con
 Route::get('/dich-vu', [StaticPageController::class, 'services'])->name('page.services');
 Route::get('/tai-khoan', [StaticPageController::class, 'auth'])->name('page.auth');
 Route::get('/don-hang', [StaticPageController::class, 'orders'])->name('page.orders');
+Route::get('/don-hang/{id}', [StaticPageController::class, 'orderDetail'])->name('page.orders.detail');
 
 // Dynamic XML Sitemap for SEO & AI Search bots
 Route::get('/sitemap.xml', function () {
@@ -94,6 +95,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/products/create', [AdminController::class, 'productCreate'])->name('admin.products.create');
     Route::post('/products', [AdminController::class, 'productStore'])->name('admin.products.store');
     Route::get('/products/{id}', [AdminController::class, 'productDetail'])->name('admin.products.detail');
+    Route::get('/products/{id}/edit', [AdminController::class, 'productEdit'])->name('admin.products.edit');
+    Route::post('/products/{id}/update', [AdminController::class, 'productUpdate'])->name('admin.products.update');
+    Route::post('/products/{id}/toggle-daily', [AdminController::class, 'toggleDaily'])->name('admin.products.toggle-daily');
     
     Route::get('/inventory', [AdminController::class, 'inventory'])->name('admin.inventory');
     Route::get('/inventory/stock-in', [AdminController::class, 'stockIn'])->name('admin.inventory.stock-in');

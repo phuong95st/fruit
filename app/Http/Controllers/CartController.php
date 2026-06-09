@@ -54,6 +54,7 @@ class CartController extends Controller
                 'ic' => $product->ic,
                 'bg' => $product->bg,
                 'svg' => $product->svg,
+                'image_url' => $product->image_url,
                 'quantity' => $quantity
             ];
         }

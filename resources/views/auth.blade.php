@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Đăng Nhập / Đăng Ký | FruitNest')
+@section('title', 'Đăng Nhập / Đăng Ký | Hoa quả Sơn Tây')
 
 @section('content')
 <div class="page active" id="page-auth">
 <div class="auth-wrap">
   <div class="auth-card">
-    <div class="auth-logo">FruitNest</div>
-    <p class="auth-sub">Chào mừng đến với FruitNest</p>
+    <div class="auth-logo">Hoa quả Sơn Tây</div>
+    <p class="auth-sub">Chào mừng đến với Hoa quả Sơn Tây</p>
     <div class="auth-tabs">
       <button class="auth-tab on" onclick="switchAuthTab(this,'a-login')">Đăng nhập</button>
       <button class="auth-tab" onclick="switchAuthTab(this,'a-register')">Tạo tài khoản</button>

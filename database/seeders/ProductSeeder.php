@@ -37,7 +37,8 @@ class ProductSeeder extends Seeder
                 'rating_value' => 4.9,
                 'reviews_count' => 128,
                 'sold_count' => 2400,
-                'nutrition' => 'Mỗi 100g: 32 kcal · Carbs 7.7g · Đường 4.9g · Chất xơ 2g · Vitamin C 58.8mg (98% DV) · Kali 153mg. Tốt cho tim mạch, miễn dịch.'
+                'nutrition' => 'Mỗi 100g: 32 kcal · Carbs 7.7g · Đường 4.9g · Chất xơ 2g · Vitamin C 58.8mg (98% DV) · Kali 153mg. Tốt cho tim mạch, miễn dịch.',
+                'is_daily' => true
             ],
             [
                 'slug' => 'xoai-cat-thai',
@@ -61,7 +62,8 @@ class ProductSeeder extends Seeder
                 'rating_value' => 4.8,
                 'reviews_count' => 96,
                 'sold_count' => 1200,
-                'nutrition' => 'Mỗi 100g: 60 kcal · Carbs 15g · Đường 13.7g · Chất xơ 1.6g · Vitamin C 36.4mg (60% DV). Tốt cho mắt và hệ tiêu hóa.'
+                'nutrition' => 'Mỗi 100g: 60 kcal · Carbs 15g · Đường 13.7g · Chất xơ 1.6g · Vitamin C 36.4mg (60% DV). Tốt cho mắt và hệ tiêu hóa.',
+                'is_daily' => true
             ],
             [
                 'slug' => 'nho-den-khong-hat',
@@ -109,7 +111,8 @@ class ProductSeeder extends Seeder
                 'rating_value' => 5.0,
                 'reviews_count' => 210,
                 'sold_count' => 3000,
-                'nutrition' => 'Mỗi 100g: 47 kcal · Vitamin C 53.2mg (89% DV) · Chất xơ 2.4g · Folate 30mcg. Giúp tăng sức đề kháng, đẹp da.'
+                'nutrition' => 'Mỗi 100g: 47 kcal · Vitamin C 53.2mg (89% DV) · Chất xơ 2.4g · Folate 30mcg. Giúp tăng sức đề kháng, đẹp da.',
+                'is_daily' => true
             ],
             [
                 'slug' => 'kiwi-xanh-nz',

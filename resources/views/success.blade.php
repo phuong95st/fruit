@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Đặt Hàng Thành Công | FruitNest')
+@section('title', 'Đặt Hàng Thành Công | Hoa quả Sơn Tây')
 
 @section('content')
 <div class="page active" id="page-success">
@@ -8,7 +8,7 @@
   <div class="success-card">
     <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
     <div class="success-title">Đặt hàng thành công!</div>
-    <p class="success-sub">Cảm ơn bạn đã mua sắm tại FruitNest. Chúng tôi sẽ liên hệ xác nhận trong 15 phút.</p>
+    <p class="success-sub">Cảm ơn bạn đã mua sắm tại Hoa quả Sơn Tây. Chúng tôi sẽ liên hệ xác nhận trong 15 phút.</p>
     
     <div class="order-info-box">
       <div class="oib"><div class="oib-label">Mã đơn</div><div class="oib-val">{{ $order['id'] }}</div></div>
@@ -56,7 +56,7 @@
     </div>
     
     <div class="success-btns">
-      <a class="btn btn-primary" href="{{ route('page.orders') }}">Theo dõi đơn</a>
+      <a class="btn btn-primary" href="{{ isset($order['db_id']) ? route('page.orders.detail', $order['db_id']) : route('page.orders') }}">Theo dõi đơn</a>
       <a class="btn btn-outline" href="{{ route('home') }}">Mua tiếp</a>
     </div>
   </div>

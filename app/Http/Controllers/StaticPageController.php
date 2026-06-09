@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Order;
 
 class StaticPageController extends Controller
 {
@@ -33,7 +34,14 @@ class StaticPageController extends Controller
 
     public function orders()
     {
-        // Ở đây hiển thị trang giả lập danh sách đơn hàng đã đặt
-        return view('orders');
+        // Lấy danh sách đơn hàng thực tế từ cơ sở dữ liệu
+        $orders = Order::with('items.product')->orderBy('created_at', 'desc')->get();
+        return view('orders', compact('orders'));
+    }
+
+    public function orderDetail($id)
+    {
+        $order = Order::with('items.product')->findOrFail($id);
+        return view('order_detail', compact('order'));
     }
 }

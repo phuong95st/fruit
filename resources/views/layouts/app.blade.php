@@ -6,15 +6,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- SEO Meta Tags -->
-    <title>@yield('title', 'FruitNest — Hoa Quả Tươi Ngon Mỗi Ngày')</title>
-    <meta name="description" content="@yield('meta_description', 'FruitNest chuyên cung cấp trái cây tươi sạch nhập khẩu và nội địa tại TP.HCM. Giao hàng siêu tốc trong 2 giờ, cam kết chất lượng tươi ngon.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'trái cây sạch, hoa quả tươi, trái cây nhập khẩu, giỏ quà tết, đĩa quả thắp hương, mâm quả cưới hỏi, giao hàng 2h')">
+    <title>@yield('title', 'Hoa quả Sơn Tây — Hoa Quả Tươi Ngon Mỗi Ngày')</title>
+    <meta name="description" content="@yield('meta_description', 'Hoa quả Sơn Tây chuyên cung cấp trái cây tươi sạch nhập khẩu và nội địa chất lượng cao. Giao hàng siêu tốc, cam kết chất lượng tươi ngon.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'trái cây sạch, hoa quả tươi, trái cây nhập khẩu, giỏ quà tết, đĩa quả thắp hương, mâm quả cưới hỏi, hoa quả sơn tây')">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="@yield('canonical_url', request()->url())">
     
     <!-- Open Graph for Facebook/Zalo/AI search snippets -->
-    <meta property="og:title" content="@yield('title', 'FruitNest — Hoa Quả Tươi Ngon Mỗi Ngày')">
-    <meta property="og:description" content="@yield('meta_description', 'FruitNest chuyên cung cấp trái cây tươi sạch nhập khẩu và nội địa tại TP.HCM. Giao hàng siêu tốc trong 2 giờ, cam kết chất lượng tươi ngon.')">
+    <meta property="og:title" content="@yield('title', 'Hoa quả Sơn Tây — Hoa Quả Tươi Ngon Mỗi Ngày')">
+    <meta property="og:description" content="@yield('meta_description', 'Hoa quả Sơn Tây chuyên cung cấp trái cây tươi sạch nhập khẩu và nội địa chất lượng cao. Giao hàng siêu tốc, cam kết chất lượng tươi ngon.')">
     <meta property="og:url" content="@yield('canonical_url', request()->url())">
     <meta property="og:type" content="website">
     <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
@@ -31,7 +31,7 @@
     {
       "@@context": "https://schema.org",
       "@@type": "Store",
-      "name": "FruitNest",
+      "name": "Hoa quả Sơn Tây",
       "image": "{{ asset('images/logo.png') }}",
       "@@id": "{{ route('home') }}",
       "url": "{{ route('home') }}",
@@ -39,10 +39,10 @@
       "priceRange": "$$",
       "address": {
         "@@type": "PostalAddress",
-        "streetAddress": "123 Nguyễn Văn Linh, Quận 7",
-        "addressLocality": "Thành phố Hồ Chí Minh",
-        "addressRegion": "TP.HCM",
-        "postalCode": "700000",
+        "streetAddress": "Thị xã Sơn Tây",
+        "addressLocality": "Sơn Tây",
+        "addressRegion": "Hà Nội",
+        "postalCode": "100000",
         "addressCountry": "VN"
       },
       "geo": {
@@ -87,7 +87,7 @@
 <!-- ═══ HEADER ═══ -->
 <header>
   <div class="wrap header-inner">
-    <a href="{{ route('home') }}" class="logo"><span class="logo-dot"></span> FruitNest</a>
+    <a href="{{ route('home') }}" class="logo"><img src="{{ asset('images/logo.png') }}" alt="Hoa quả Sơn Tây Logo" style="height: 36px; width: auto; margin-right: 8px;"> Hoa quả Sơn Tây</a>
     
     <!-- Desktop Search -->
     <form action="{{ route('shop.index') }}" method="GET" class="header-search hide-mobile">
@@ -192,7 +192,7 @@
 <div class="mob-overlay" id="mobOverlay" onclick="closeDrawer()"></div>
 <div class="mob-drawer" id="mobDrawer">
   <div class="mob-head">
-    <span class="mob-head-logo">FruitNest</span>
+    <span class="mob-head-logo">Hoa quả Sơn Tây</span>
     <button class="mob-close" onclick="closeDrawer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <div class="mob-section-title">Danh mục</div>
@@ -219,8 +219,8 @@
     <div class="footer-top">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="f-logo">FruitNest</div>
-          <p>Chuyên cung cấp trái cây tươi nhập khẩu và nội địa tại TP.HCM. Giao hàng nhanh, chất lượng đảm bảo.</p>
+          <div class="f-logo">Hoa quả Sơn Tây</div>
+          <p>Chuyên cung cấp trái cây tươi nhập khẩu và nội địa chất lượng cao. Giao hàng nhanh, chất lượng đảm bảo.</p>
           <div class="footer-socials">
             <div class="fsocial"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></div>
             <div class="fsocial"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor"/></svg></div>
@@ -253,15 +253,15 @@
           <h4>Liên hệ</h4>
           <ul>
             <li><a>Hotline: 0909 123 456</a></li>
-            <li><a>Email: hello@fruitnest.vn</a></li>
-            <li><a>123 Nguyễn Văn Linh, Q7</a></li>
+            <li><a>Email: hello@hoaquasontay.vn</a></li>
+            <li><a>Thị xã Sơn Tây, Hà Nội</a></li>
             <li><a>7:00 – 21:00 hàng ngày</a></li>
           </ul>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 FruitNest. Bảo lưu mọi quyền.</span>
+      <span>© 2026 Hoa quả Sơn Tây. Bảo lưu mọi quyền.</span>
       <span>Thanh toán: ATM · Thẻ ngân hàng · Tiền mặt (COD)</span>
     </div>
   </div>

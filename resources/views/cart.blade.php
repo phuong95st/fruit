@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Giỏ Hàng | FruitNest')
+@section('title', 'Giỏ Hàng | Hoa quả Sơn Tây')
 
 @section('content')
 <div class="page active" id="page-cart">
@@ -31,12 +31,16 @@
             @foreach($cart as $id => $item)
               <div class="cart-item" id="cart-item-{{ $item['id'] }}">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <div class="ci-img-box {{ $item['bg'] }}">
-                    <div class="fruit-ico {{ $item['ic'] }}"><svg viewBox="0 0 24 24">{!! $item['svg'] !!}</svg></div>
+                  <div class="ci-img-box {{ (isset($item['image_url']) && $item['image_url']) ? '' : $item['bg'] }}">
+                    @if(isset($item['image_url']) && $item['image_url'])
+                      <img src="{{ $item['image_url'] }}" alt="{{ $item['name'] }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                    @else
+                      <div class="fruit-ico {{ $item['ic'] }}"><svg viewBox="0 0 24 24">{!! $item['svg'] !!}</svg></div>
+                    @endif
                   </div>
                   <div class="ci-info">
                     <div class="ci-name">{{ $item['name'] }}</div>
-                    <div class="ci-sub">/{{ $item['unit'] }} · FruitNest</div>
+                    <div class="ci-sub">/{{ $item['unit'] }} · Hoa quả Sơn Tây</div>
                   </div>
                 </div>
                 <div class="ci-mob-row">

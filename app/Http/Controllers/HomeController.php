@@ -20,6 +20,9 @@ class HomeController extends Controller
         // Trái cây nhập khẩu
         $imports = Product::where('t1', 'Nhập khẩu')->get();
 
-        return view('home', compact('featuredProducts', 'baskets', 'imports'));
+        // Sản phẩm bán trong ngày (thiết định bởi admin)
+        $dailyProducts = Product::where('is_daily', true)->get();
+
+        return view('home', compact('featuredProducts', 'baskets', 'imports', 'dailyProducts'));
     }
 }

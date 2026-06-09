@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Thanh Toán Đơn Hàng | FruitNest')
+@section('title', 'Thanh Toán Đơn Hàng | Hoa quả Sơn Tây')
 
 @section('content')
 <div class="page active" id="page-checkout">
@@ -51,16 +51,16 @@
             <div class="form-group">
               <label class="form-label">Tỉnh / Thành *</label>
               <select class="form-input" name="city" required>
-                <option value="TP. Hồ Chí Minh" selected>TP. Hồ Chí Minh</option>
-                <option value="Hà Nội">Hà Nội</option>
+                <option value="Hà Nội" selected>Hà Nội</option>
+                <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
               </select>
             </div>
             <div class="form-group">
               <label class="form-label">Quận / Huyện *</label>
               <select class="form-input" name="district" required>
-                <option value="Quận 7" selected>Quận 7</option>
-                <option value="Quận 1">Quận 1</option>
-                <option value="Bình Thạnh">Bình Thạnh</option>
+                <option value="Thị xã Sơn Tây" selected>Thị xã Sơn Tây</option>
+                <option value="Ba Đình">Ba Đình</option>
+                <option value="Cầu Giấy">Cầu Giấy</option>
               </select>
             </div>
           </div>
@@ -131,8 +131,12 @@
         <div id="co-items">
           @foreach($cart as $id => $item)
             <div class="co-item">
-              <div class="co-img {{ $item['bg'] }}">
-                <div class="fruit-ico {{ $item['ic'] }}"><svg viewBox="0 0 24 24">{!! $item['svg'] !!}</svg></div>
+              <div class="co-img {{ (isset($item['image_url']) && $item['image_url']) ? '' : $item['bg'] }}">
+                @if(isset($item['image_url']) && $item['image_url'])
+                  <img src="{{ $item['image_url'] }}" alt="{{ $item['name'] }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                @else
+                  <div class="fruit-ico {{ $item['ic'] }}"><svg viewBox="0 0 24 24">{!! $item['svg'] !!}</svg></div>
+                @endif
               </div>
               <div>
                 <div class="co-name">{{ $item['name'] }}</div>
