@@ -10,6 +10,9 @@ use App\Models\Product;
 use App\Models\Voucher;
 use App\Models\StockIn;
 use App\Models\StockInItem;
+use App\Models\User;
+use App\Models\Comment;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class AdminDataSeeder extends Seeder
@@ -290,5 +293,62 @@ class AdminDataSeeder extends Seeder
             'total_items' => 1,
             'total_value' => 6200000,
         ]);
+
+        // 5. Tạo Người dùng (Users)
+        $user1 = User::create([
+            'name' => 'Nguyễn Văn Khách',
+            'email' => 'khachhang@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => Carbon::now(),
+        ]);
+
+        $user2 = User::create([
+            'name' => 'Trần Thị Admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => Carbon::now(),
+            'is_admin' => true,
+        ]);
+
+        // 6. Tạo bình luận mẫu (Comments)
+        if ($strawberry) {
+            Comment::create([
+                'product_id' => $strawberry->id,
+                'author_name' => 'Hồng Nhung',
+                'content' => 'Dâu tây Đà Lạt rất ngọt và to, đóng gói cẩn thận. Giao hàng cực nhanh trong 2 tiếng.',
+                'rating' => 5,
+                'created_at' => Carbon::now()->subDays(2),
+            ]);
+
+            Comment::create([
+                'product_id' => $strawberry->id,
+                'user_id' => $user1->id,
+                'author_name' => $user1->name,
+                'content' => 'Trái dâu tươi ngon mọng nước, mua tặng gia đình ai cũng khen ngon và thích thú. Sẽ ủng hộ shop dài dài!',
+                'rating' => 5,
+                'created_at' => Carbon::now()->subDay(),
+            ]);
+        }
+
+        if ($mango) {
+            Comment::create([
+                'product_id' => $mango->id,
+                'author_name' => 'Anh Tuấn',
+                'content' => 'Xoài ngon thơm ngọt lịm, tuy nhiên đợt này quả hơi nhỏ hơn chút. Vẫn đánh giá shop 5 sao vì thái độ phục vụ chu đáo.',
+                'rating' => 5,
+                'created_at' => Carbon::now()->subDays(3),
+            ]);
+        }
+
+        if ($grape) {
+            Comment::create([
+                'product_id' => $grape->id,
+                'user_id' => $user1->id,
+                'author_name' => $user1->name,
+                'content' => 'Nho đen ăn giòn và rất ngọt, không có hạt nên bé nhà mình rất thích. Đáng tiền lắm nha mọi người!',
+                'rating' => 5,
+                'created_at' => Carbon::now()->subHours(5),
+            ]);
+        }
     }
 }

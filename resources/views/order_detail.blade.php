@@ -16,16 +16,78 @@
   <div class="account-layout">
     <!-- Sidebar Account Info -->
     <aside class="acc-sidebar">
+      @php
+        $customerName = 'Khách vãng lai';
+        $customerContact = 'Chưa đăng nhập';
+        if (Auth::check()) {
+            $customerName = Auth::user()->name;
+            $customerContact = Auth::user()->email;
+        } else {
+            $customerName = $order->customer_name;
+            $customerContact = $order->customer_phone;
+        }
+      @endphp
       <div class="acc-profile">
-        <div class="acc-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-        <div class="acc-name">{{ $order->customer_name }}</div>
-        <div class="acc-phone">{{ $order->customer_phone }}</div>
+        <div class="acc-avatar" style="position: relative; overflow: hidden; width: 48px; height: 48px; border-radius: 50%;">
+          @if(Auth::check() && Auth::user()->avatar)
+            <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          @else
+            <svg viewBox="0 0 24 24" style="width: 100%; height: 100%;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          @endif
+        </div>
+        <div class="acc-name">{{ $customerName }}</div>
+        <div class="acc-email">{{ $customerContact }}</div>
       </div>
       <ul class="acc-menu">
-        <li><a class="on" href="{{ route('page.orders') }}"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Đơn hàng của tôi</a></li>
-        <li><a onclick="alert('Tính năng đang được phát triển')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Thông tin cá nhân</a></li>
-        <li><a onclick="alert('Tính năng đang được phát triển')"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Địa chỉ giao hàng</a></li>
-        <li><a class="danger" href="{{ route('page.auth') }}"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Đăng xuất</a></li>
+        <li>
+          <a href="{{ route('page.auth') }}">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+            Bảng điều khiển
+          </a>
+        </li>
+        <li>
+          <a class="on" href="{{ route('page.orders') }}">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Đơn hàng của tôi
+          </a>
+        </li>
+        <li>
+          <a @if(Auth::check()) href="{{ route('page.profile') }}" @else onclick="alert('Tính năng dành cho thành viên đã đăng nhập')" style="cursor:pointer;" @endif>
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Thông tin cá nhân
+          </a>
+        </li>
+        <li>
+          <a onclick="alert('{{ Auth::check() ? 'Tính năng đang được phát triển' : 'Tính năng dành cho thành viên đã đăng nhập' }}')" style="cursor:pointer;">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Địa chỉ giao hàng
+          </a>
+        </li>
+        <li>
+          <a onclick="alert('{{ Auth::check() ? 'Tính năng đang được phát triển' : 'Tính năng dành cho thành viên đã đăng nhập' }}')" style="cursor:pointer;">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            Sản phẩm yêu thích
+          </a>
+        </li>
+        @if(Auth::check() && Auth::user()->is_admin)
+        <li>
+          <a href="{{ route('admin.dashboard') }}" style="color: var(--g700); font-weight: 600;">
+            <svg viewBox="0 0 24 24" style="stroke: var(--g700); fill: none;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="21" x2="9" y2="9"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="15" x2="21" y2="15"/></svg>
+            Trang quản trị (Admin)
+          </a>
+        </li>
+        @endif
+        @if(Auth::check())
+          <li>
+            <a class="danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('order-detail-logout-form').submit();">
+              <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Đăng xuất
+            </a>
+            <form id="order-detail-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+              @csrf
+            </form>
+          </li>
+        @endif
       </ul>
     </aside>
     

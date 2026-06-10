@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Thanh Toán Đơn Hàng | Hoa quả Sơn Tây')
+@section('meta_robots', 'noindex, nofollow')
 
 @section('content')
 <div class="page active" id="page-checkout">
@@ -99,18 +100,31 @@
         <div class="checkout-card">
           <div class="checkout-step-title"><div class="step-circle">3</div> Phương thức thanh toán</div>
           <div class="pay-opts">
-            <label class="pay-opt sel" onclick="selPay(this)">
-              <input type="radio" name="payment_method" value="banking" checked style="display:none;"/>
-              <div class="pay-opt-icon">
-                <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            @if(Auth::check())
+              <label class="pay-opt sel" onclick="selPay(this)">
+                <input type="radio" name="payment_method" value="banking" checked style="display:none;"/>
+                <div class="pay-opt-icon">
+                  <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+                <div>
+                  <div class="pay-opt-name">ATM / Thẻ ngân hàng</div>
+                  <div class="pay-opt-desc">Hỗ trợ tất cả ngân hàng nội địa</div>
+                </div>
+              </label>
+            @else
+              <div class="pay-opt disabled" style="opacity:0.6; cursor:not-allowed; display:flex; align-items:center; gap:10px; border:1px solid var(--border); border-radius:var(--radius-md); padding:9px 12px; position:relative; background:#fafafa;">
+                <div class="pay-opt-icon">
+                  <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+                <div>
+                  <div class="pay-opt-name" style="color:var(--n500); font-weight:600;">ATM / Thẻ ngân hàng (Khóa)</div>
+                  <div class="pay-opt-desc" style="color:var(--r700); font-weight:700;">Đăng nhập để sử dụng thanh toán Online</div>
+                </div>
               </div>
-              <div>
-                <div class="pay-opt-name">ATM / Thẻ ngân hàng</div>
-                <div class="pay-opt-desc">Hỗ trợ tất cả ngân hàng nội địa</div>
-              </div>
-            </label>
-            <label class="pay-opt" onclick="selPay(this)">
-              <input type="radio" name="payment_method" value="cod" style="display:none;"/>
+            @endif
+
+            <label class="pay-opt {{ Auth::check() ? '' : 'sel' }}" onclick="selPay(this)">
+              <input type="radio" name="payment_method" value="cod" {{ Auth::check() ? '' : 'checked' }} style="display:none;"/>
               <div class="pay-opt-icon">
                 <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
               </div>

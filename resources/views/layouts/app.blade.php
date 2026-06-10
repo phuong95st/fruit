@@ -9,7 +9,7 @@
     <title>@yield('title', 'Hoa quả Sơn Tây — Hoa Quả Tươi Ngon Mỗi Ngày')</title>
     <meta name="description" content="@yield('meta_description', 'Hoa quả Sơn Tây chuyên cung cấp trái cây tươi sạch nhập khẩu và nội địa chất lượng cao. Giao hàng siêu tốc, cam kết chất lượng tươi ngon.')">
     <meta name="keywords" content="@yield('meta_keywords', 'trái cây sạch, hoa quả tươi, trái cây nhập khẩu, giỏ quà tết, đĩa quả thắp hương, mâm quả cưới hỏi, hoa quả sơn tây')">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="@yield('meta_robots', 'index, follow')">
     <link rel="canonical" href="@yield('canonical_url', request()->url())">
     
     <!-- Open Graph for Facebook/Zalo/AI search snippets -->
@@ -79,7 +79,22 @@
       <a href="{{ route('page.about') }}">Giới thiệu</a>
       <a href="{{ route('page.policy') }}">Chính sách</a>
       <a href="{{ route('page.contact') }}">Liên hệ</a>
-      <a href="{{ route('page.auth') }}">Đăng nhập</a>
+      @if(Auth::check())
+        <a href="{{ route('page.auth') }}" style="display:inline-flex; align-items:center; gap:5px;">
+          @if(Auth::user()->avatar)
+            <span style="width:14px; height:14px; border-radius:50%; overflow:hidden; display:inline-block;">
+              <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </span>
+          @endif
+          Chào, <b>{{ Auth::user()->name }}</b>
+        </a>
+        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('topbar-logout-form').submit();" style="color:#ff6b6b; font-weight:600; margin-left:8px;">Đăng xuất</a>
+        <form id="topbar-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+          @csrf
+        </form>
+      @else
+        <a href="{{ route('page.auth') }}">Đăng nhập</a>
+      @endif
     </div>
   </div>
 </div>
@@ -97,8 +112,20 @@
     
     <div class="header-actions">
       <a class="hbtn hide-mobile" href="{{ route('page.auth') }}">
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="hbtn-label">Tài khoản</span>
+        @if(Auth::check() && Auth::user()->avatar)
+          <span style="width:16px; height:16px; border-radius:50%; overflow:hidden; display:inline-block; margin-bottom:2px;">
+            <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">
+          </span>
+        @else
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        @endif
+        <span class="hbtn-label">
+          @if(Auth::check())
+            {{ Str::limit(Auth::user()->name, 10) }}
+          @else
+            Tài khoản
+          @endif
+        </span>
       </a>
       <a class="hbtn hide-mobile" href="{{ route('page.orders') }}">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -202,8 +229,34 @@
   <a class="mob-link" href="{{ route('shop.index', ['categories[]' => 'Giỏ quà']) }}"><svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg> Giỏ quà</a>
   <a class="mob-link featured" href="{{ route('page.services') }}"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Dịch vụ đặc biệt</a>
   <div class="mob-section-title">Tài khoản</div>
-  <a class="mob-link" href="{{ route('page.auth') }}"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Đăng nhập / Đăng ký</a>
-  <a class="mob-link" href="{{ route('page.orders') }}"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16"/></svg> Đơn hàng của tôi</a>
+  @if(Auth::check())
+    <a class="mob-link" href="{{ route('page.auth') }}">
+      @if(Auth::user()->avatar)
+        <span style="width:16px; height:16px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:8px; vertical-align:middle;">
+          <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">
+        </span>
+      @else
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      @endif
+      Chào, {{ Auth::user()->name }}
+    </a>
+    <a class="mob-link" href="{{ route('page.orders') }}">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Đơn hàng của tôi
+    </a>
+    <a class="mob-link danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('mob-logout-form').submit();" style="color:#c03030;">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Đăng xuất
+    </a>
+    <form id="mob-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+      @csrf
+    </form>
+  @else
+    <a class="mob-link" href="{{ route('page.auth') }}">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Đăng nhập / Đăng ký
+    </a>
+  @endif
   <div class="mob-section-title">Thông tin</div>
   <a class="mob-link" href="{{ route('page.about') }}"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Giới thiệu</a>
   <a class="mob-link" href="{{ route('page.policy') }}"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Chính sách</a>

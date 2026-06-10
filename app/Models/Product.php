@@ -78,7 +78,7 @@ class Product extends Model
     /**
      * Sinh dữ liệu cấu trúc JSON-LD chuẩn SEO cho AI & Google Search
      */
-    public function toJsonLd()
+    public function toJsonLd($comments = null)
     {
         $data = [
             '@context' => 'https://schema.org',
@@ -110,6 +110,36 @@ class Product extends Model
             ];
         }
 
+        if ($comments && $comments->isNotEmpty()) {
+            $reviewData = [];
+            foreach ($comments as $comment) {
+                $reviewData[] = [
+                    '@type' => 'Review',
+                    'author' => [
+                        '@type' => 'Person',
+                        'name' => $comment->author_name
+                    ],
+                    'datePublished' => $comment->created_at->toIso8601String(),
+                    'reviewBody' => $comment->content,
+                    'reviewRating' => [
+                        '@type' => 'Rating',
+                        'ratingValue' => (int)$comment->rating,
+                        'bestRating' => 5,
+                        'worstRating' => 1
+                    ]
+                ];
+            }
+            $data['review'] = $reviewData;
+        }
+
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Get the comments for the product.
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

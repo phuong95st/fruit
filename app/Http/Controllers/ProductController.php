@@ -26,6 +26,9 @@ class ProductController extends Controller
             $relatedProducts = $relatedProducts->merge($extraProducts);
         }
 
-        return view('detail', compact('product', 'relatedProducts'));
+        // Lấy danh sách bình luận của sản phẩm
+        $comments = $product->comments()->orderBy('created_at', 'desc')->get();
+
+        return view('detail', compact('product', 'relatedProducts', 'comments'));
     }
 }

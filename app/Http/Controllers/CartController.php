@@ -131,31 +131,89 @@ class CartController extends Controller
      */
     public function applyCoupon(Request $request)
     {
-        $code = strtoupper(trim($request->input('coupon_code')));
-        
-        if ($code === 'FRUIT10') {
-            session()->put('coupon', [
-                'code' => 'FRUIT10',
-                'discount_percent' => 10
-            ]);
-            
+        // 1. Kiểm tra xem người dùng đã đăng nhập chưa
+        if (!auth()->check()) {
             if ($request->wantsJson()) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Áp dụng mã giảm giá 10% thành công!',
-                    'totals' => $this->getCartTotals()
+                    'success' => false,
+                    'message' => 'Vui lòng đăng nhập để áp dụng mã giảm giá.'
                 ]);
             }
-            return redirect()->route('cart.index')->with('success', 'Áp dụng mã giảm giá thành công.');
+            return redirect()->route('cart.index')->with('error', 'Vui lòng đăng nhập để áp dụng mã giảm giá.');
         }
+
+        $code = strtoupper(trim($request->input('coupon_code')));
         
+        // 2. Tìm voucher trong cơ sở dữ liệu
+        $voucher = \App\Models\Voucher::where('code', $code)->first();
+        if (!$voucher) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mã giảm giá không tồn tại.'
+                ]);
+            }
+            return redirect()->route('cart.index')->with('error', 'Mã giảm giá không tồn tại.');
+        }
+
+        // 3. Kiểm tra hạn sử dụng
+        if ($voucher->expires_at && \Carbon\Carbon::parse($voucher->expires_at)->isPast()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mã giảm giá này đã hết hạn.'
+                ]);
+            }
+            return redirect()->route('cart.index')->with('error', 'Mã giảm giá này đã hết hạn.');
+        }
+
+        // 4. Kiểm tra số lượng
+        if ($voucher->quantity <= 0) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mã giảm giá này đã hết lượt sử dụng.'
+                ]);
+            }
+            return redirect()->route('cart.index')->with('error', 'Mã giảm giá này đã hết lượt sử dụng.');
+        }
+
+        // 5. Kiểm tra giá trị đơn hàng tối thiểu
+        $cart = session()->get('cart', []);
+        $subtotal = 0;
+        foreach ($cart as $id => $item) {
+            $subtotal += $item['price'] * $item['quantity'];
+        }
+
+        if ($subtotal < $voucher->min_order_value) {
+            $msg = 'Đơn hàng tối thiểu ' . number_format($voucher->min_order_value, 0, ',', '.') . 'đ để áp dụng mã này.';
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg
+                ]);
+            }
+            return redirect()->route('cart.index')->with('error', $msg);
+        }
+
+        // 6. Lưu vào session
+        session()->put('coupon', [
+            'code' => $voucher->code,
+            'discount_type' => $voucher->discount_type,
+            'discount_value' => (float)$voucher->discount_value
+        ]);
+        
+        $discountText = $voucher->discount_type === 'percent' ? (int)$voucher->discount_value . '%' : number_format($voucher->discount_value, 0, ',', '.') . 'đ';
+        $successMsg = 'Áp dụng mã giảm giá ' . $discountText . ' thành công!';
+
         if ($request->wantsJson()) {
             return response()->json([
-                'success' => false,
-                'message' => 'Mã giảm giá không hợp lệ.'
+                'success' => true,
+                'message' => $successMsg,
+                'totals' => $this->getCartTotals()
             ]);
         }
-        return redirect()->route('cart.index')->with('error', 'Mã giảm giá không hợp lệ.');
+        return redirect()->route('cart.index')->with('success', $successMsg);
     }
 
     /**
@@ -180,11 +238,15 @@ class CartController extends Controller
         
         $discount = 0;
         $coupon = session()->get('coupon');
-        if ($coupon && $coupon['code'] === 'FRUIT10') {
-            $discount = round($subtotal * 0.1);
+        if ($coupon) {
+            if ($coupon['discount_type'] === 'percent') {
+                $discount = round($subtotal * ($coupon['discount_value'] / 100));
+            } else {
+                $discount = min($coupon['discount_value'], $subtotal);
+            }
         }
         
-        $total = $subtotal - $discount;
+        $total = max(0, $subtotal - $discount);
         
         return [
             'subtotal' => number_format($subtotal, 0, ',', '.') . 'đ',

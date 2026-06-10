@@ -26,11 +26,15 @@ class CheckoutController extends Controller
 
         $discount = 0;
         $coupon = session()->get('coupon');
-        if ($coupon && $coupon['code'] === 'FRUIT10') {
-            $discount = round($subtotal * 0.1);
+        if ($coupon) {
+            if ($coupon['discount_type'] === 'percent') {
+                $discount = round($subtotal * ($coupon['discount_value'] / 100));
+            } else {
+                $discount = min($coupon['discount_value'], $subtotal);
+            }
         }
 
-        $total = $subtotal - $discount;
+        $total = max(0, $subtotal - $discount);
 
         return view('checkout', compact('cart', 'subtotal', 'discount', 'total'));
     }
@@ -47,15 +51,19 @@ class CheckoutController extends Controller
             'address' => 'required|string|max:255',
             'city' => 'required|string',
             'district' => 'required|string',
+            'payment_method' => 'required|string|in:banking,cod',
         ]);
+
+        // Kiểm tra bảo mật: Khách chưa đăng nhập KHÔNG được thanh toán online (banking)
+        if (!auth()->check() && $request->input('payment_method') === 'banking') {
+            return back()->withErrors(['payment_method' => 'Bạn phải đăng nhập để sử dụng phương thức thanh toán Online/Chuyển khoản.'])->withInput();
+        }
 
         $cart = session()->get('cart', []);
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đã hết hạn hoặc trống.');
         }
 
-        // Thực tế ở đây sẽ lưu Order vào Database.
-        // Ở đây chúng ta giả lập lưu thông tin đơn hàng vào session để hiển thị ở trang thành công.
         $subtotal = 0;
         foreach ($cart as $id => $item) {
             $subtotal += $item['price'] * $item['quantity'];
@@ -63,11 +71,15 @@ class CheckoutController extends Controller
 
         $discount = 0;
         $coupon = session()->get('coupon');
-        if ($coupon && $coupon['code'] === 'FRUIT10') {
-            $discount = round($subtotal * 0.1);
+        if ($coupon) {
+            if ($coupon['discount_type'] === 'percent') {
+                $discount = round($subtotal * ($coupon['discount_value'] / 100));
+            } else {
+                $discount = min($coupon['discount_value'], $subtotal);
+            }
         }
 
-        $total = $subtotal - $discount;
+        $total = max(0, $subtotal - $discount);
         $orderId = 'HQST-' . date('Ymd') . '-' . rand(10000, 99999);
 
         // 1. Tạo hoặc lấy thông tin khách hàng dựa trên SĐT

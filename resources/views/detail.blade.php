@@ -131,18 +131,118 @@
         <div class="tab-panel" id="t-nutri">
           <p>{!! $product->nutrition ?: 'Mỗi 100g chứa nhiều vitamin, chất xơ và khoáng chất cần thiết. Rất tốt cho sức khỏe.' !!}</p>
         </div>
+
         <div class="tab-panel" id="t-reviews">
-          <div class="review-item">
-            <div class="rv-head"><span class="rv-name">Nguyễn Thị Hương</span><span class="rv-date">2 ngày trước</span></div>
-            <div class="rv-stars">★★★★★</div>
-            <p style="font-size:var(--fs-sm);color:var(--n700);margin-top:3px;">Trái cây rất tươi ngon, giao hàng cực nhanh, shipper lịch sự. Chắc chắn sẽ tiếp tục ủng hộ cửa hàng!</p>
+          <!-- Comments List -->
+          <div class="reviews-list" style="margin-bottom: 20px; display:flex; flex-direction:column; gap:8px;">
+            @if($comments->isEmpty())
+              <p style="font-size:var(--fs-sm); color:var(--n500); text-align:center; padding:15px 0;">Chưa có bình luận nào cho sản phẩm này. Hãy là người đầu tiên đánh giá!</p>
+            @else
+              @foreach($comments as $comment)
+                <div class="review-item" style="border: 1px solid var(--n100); border-radius: var(--radius-md); padding: 8px; margin-bottom: 6px;">
+                  <div class="rv-head" style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: var(--fs-xs);">
+                    <span class="rv-name" style="font-weight: 700;">{{ $comment->author_name }}</span>
+                    <span class="rv-date" style="color: var(--n500);">{{ $comment->created_at->diffForHumans() }}</span>
+                  </div>
+                  <div class="rv-stars" style="color:#e07b2a; font-size: var(--fs-xs);">
+                    @for($i=1; $i<=$comment->rating; $i++)★@endfor
+                    @for($i=$comment->rating+1; $i<=5; $i++)☆@endfor
+                  </div>
+                  <p style="font-size:var(--fs-sm); color:var(--n700); margin-top:3px; line-height:1.45;">{{ $comment->content }}</p>
+                </div>
+              @endforeach
+            @endif
           </div>
-          <div class="review-item">
-            <div class="rv-head"><span class="rv-name">Trần Văn Minh</span><span class="rv-date">5 ngày trước</span></div>
-            <div class="rv-stars">★★★★★</div>
-            <p style="font-size:var(--fs-sm);color:var(--n700);margin-top:3px;">Đóng gói đẹp và cẩn thận. Trái cây ngọt đậm đà, cả nhà ai cũng khen.</p>
+
+          <!-- Add Review Form -->
+          <div style="border-top:1px solid var(--border); padding-top:15px; margin-top:15px;">
+            <h4 style="font-family:'Merriweather',serif; font-size:var(--fs-md); color:var(--g900); margin-bottom:12px;">Viết bình luận đánh giá</h4>
+            
+            @if(Auth::check())
+              <!-- LOGGED IN USER COMMENT FORM -->
+              <form action="{{ route('comment.store') }}" method="POST" style="display:flex; flex-direction:column; gap:10px;">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}"/>
+                
+                <div style="font-size:var(--fs-sm); color:var(--n700);">
+                  Bình luận với tư cách: <b>{{ Auth::user()->name }}</b>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Đánh giá sao</label>
+                  <select class="form-input" name="rating" style="width: 100px;">
+                    <option value="5" selected>5 ★</option>
+                    <option value="4">4 ★</option>
+                    <option value="3">3 ★</option>
+                    <option value="2">2 ★</option>
+                    <option value="1">1 ★</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Nội dung bình luận *</label>
+                  <textarea class="form-input" name="content" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..." required style="min-height: 80px;"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Gửi bình luận</button>
+              </form>
+            @else
+              <!-- GUEST USER COMMENT FORM WITH 2 OPTIONS -->
+              <div style="margin-bottom:15px; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;">
+                <!-- Choice Tabs -->
+                <div style="display:flex; background:var(--n50); border-bottom:1px solid var(--border);">
+                  <button type="button" id="opt-guest-btn" onclick="toggleCommentOption('guest')" style="flex:1; padding:8px; border:none; background:#fff; font-size:var(--fs-xs); font-weight:700; cursor:pointer; color:var(--g700); border-bottom:2px solid var(--g700); outline: none;">
+                    Bình luận nhanh không cần tài khoản
+                  </button>
+                  <button type="button" id="opt-login-btn" onclick="toggleCommentOption('login')" style="flex:1; padding:8px; border:none; background:none; font-size:var(--fs-xs); font-weight:700; cursor:pointer; color:var(--n500); outline: none;">
+                    Đăng nhập để bình luận
+                  </button>
+                </div>
+
+                <!-- Option 1: Quick Comment Form (Guest) -->
+                <div id="comment-guest-panel" style="padding:15px; background:#fff;">
+                  <form action="{{ route('comment.store') }}" method="POST" style="display:flex; flex-direction:column; gap:10px;">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}"/>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label class="form-label">Họ và tên của bạn *</label>
+                      <input class="form-input" name="author_name" placeholder="Nguyễn Văn A" required/>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label class="form-label">Đánh giá sao</label>
+                      <select class="form-input" name="rating" style="width: 100px;">
+                        <option value="5" selected>5 ★</option>
+                        <option value="4">4 ★</option>
+                        <option value="3">3 ★</option>
+                        <option value="2">2 ★</option>
+                        <option value="1">1 ★</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label class="form-label">Nội dung bình luận *</label>
+                      <textarea class="form-input" name="content" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..." required style="min-height: 80px;"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Gửi bình luận nhanh</button>
+                  </form>
+                </div>
+
+                <!-- Option 2: Redirect to Login Box -->
+                <div id="comment-login-panel" style="padding:25px 15px; text-align:center; background:#fff; display:none;">
+                  <svg viewBox="0 0 24 24" style="width:40px; height:40px; stroke:var(--n300); fill:none; stroke-width:1.5; margin:0 auto 10px; display:block;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <p style="font-size:var(--fs-sm); color:var(--n700); margin-bottom:12px; line-height:1.4;">Đăng nhập tài khoản giúp bạn lưu trữ lịch sử đánh giá sản phẩm và nhận các mã ưu đãi độc quyền.</p>
+                  <a href="{{ route('page.auth') }}" class="btn btn-primary btn-sm" style="display:inline-flex;">
+                    Đăng nhập / Tạo tài khoản ngay
+                  </a>
+                </div>
+              </div>
+            @endif
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -165,6 +265,41 @@
 @section('scripts')
 <script>
     let curQty = 1;
+    
+    function toggleCommentOption(type) {
+        const guestPanel = document.getElementById('comment-guest-panel');
+        const loginPanel = document.getElementById('comment-login-panel');
+        const guestBtn = document.getElementById('opt-guest-btn');
+        const loginBtn = document.getElementById('opt-login-btn');
+        
+        if (type === 'guest') {
+            if (guestPanel) guestPanel.style.display = 'block';
+            if (loginPanel) loginPanel.style.display = 'none';
+            if (guestBtn) {
+                guestBtn.style.background = '#fff';
+                guestBtn.style.borderBottom = '2px solid var(--g700)';
+                guestBtn.style.color = 'var(--g700)';
+            }
+            if (loginBtn) {
+                loginBtn.style.background = 'none';
+                loginBtn.style.borderBottom = 'none';
+                loginBtn.style.color = 'var(--n500)';
+            }
+        } else {
+            if (guestPanel) guestPanel.style.display = 'none';
+            if (loginPanel) loginPanel.style.display = 'block';
+            if (loginBtn) {
+                loginBtn.style.background = '#fff';
+                loginBtn.style.borderBottom = '2px solid var(--g700)';
+                loginBtn.style.color = 'var(--g700)';
+            }
+            if (guestBtn) {
+                guestBtn.style.background = 'none';
+                guestBtn.style.borderBottom = 'none';
+                guestBtn.style.color = 'var(--n500)';
+            }
+        }
+    }
     
     function chQty(d) {
         curQty = Math.max(1, curQty + d);

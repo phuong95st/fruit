@@ -32,10 +32,29 @@ class StaticPageController extends Controller
         return view('auth');
     }
 
-    public function orders()
+    public function orders(Request $request)
     {
-        // Lấy danh sách đơn hàng thực tế từ cơ sở dữ liệu
-        $orders = Order::with('items.product')->orderBy('created_at', 'desc')->get();
+        if (auth()->check()) {
+            $user = auth()->user();
+            $orders = Order::with('items.product')
+                ->where('customer_phone', $user->phone)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            $phone = $request->input('lookup_phone');
+            if (!$phone && session('last_order')) {
+                $phone = session('last_order')['phone'];
+            }
+
+            if ($phone) {
+                $orders = Order::with('items.product')
+                    ->where('customer_phone', $phone)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            } else {
+                $orders = collect();
+            }
+        }
         return view('orders', compact('orders'));
     }
 

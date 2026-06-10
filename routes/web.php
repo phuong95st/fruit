@@ -8,6 +8,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Models\Product;
 
 // Trang chủ
@@ -34,7 +36,32 @@ Route::get('/gioi-thieu', [StaticPageController::class, 'about'])->name('page.ab
 Route::get('/chinh-sach', [StaticPageController::class, 'policy'])->name('page.policy');
 Route::get('/lien-he', [StaticPageController::class, 'contact'])->name('page.contact');
 Route::get('/dich-vu', [StaticPageController::class, 'services'])->name('page.services');
-Route::get('/tai-khoan', [StaticPageController::class, 'auth'])->name('page.auth');
+// Hệ thống Xác thực (Auth)
+Route::get('/tai-khoan', [AuthController::class, 'index'])->name('page.auth');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Thông tin cá nhân (Profile)
+Route::middleware('auth')->group(function () {
+    Route::get('/thong-tin-ca-nhan', [AuthController::class, 'profile'])->name('page.profile');
+    Route::post('/thong-tin-ca-nhan', [AuthController::class, 'updateProfile'])->name('profile.update');
+});
+
+// Quên mật khẩu
+Route::get('/quen-mat-khau', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/quen-mat-khau', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::get('/dat-lai-mat-khau', [AuthController::class, 'showResetPassword'])->name('password.reset');
+Route::post('/dat-lai-mat-khau', [AuthController::class, 'resetPassword'])->name('password.update');
+
+// Giả lập Đăng nhập Mạng xã hội (Google & Facebook)
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/auth/facebook', [AuthController::class, 'redirectToFacebook'])->name('auth.facebook');
+Route::get('/auth/facebook/callback', [AuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
+
+// Bình luận sản phẩm
+Route::post('/binh-luan', [CommentController::class, 'store'])->name('comment.store');
 Route::get('/don-hang', [StaticPageController::class, 'orders'])->name('page.orders');
 Route::get('/don-hang/{id}', [StaticPageController::class, 'orderDetail'])->name('page.orders.detail');
 
@@ -84,7 +111,7 @@ Route::get('/sitemap.xml', function () {
 use App\Http\Controllers\Admin\AdminController;
 
 // Admin Panel Routes
-Route::prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
     
