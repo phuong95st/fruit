@@ -54,6 +54,10 @@
               <label>Mô tả ngắn & chi tiết</label>
               <textarea name="desc" style="min-height:100px;" placeholder="Nhập mô tả sản phẩm...">{{ old('desc') }}</textarea>
             </div>
+            <div class="fg form-full">
+              <label>Thông tin dinh dưỡng</label>
+              <textarea name="nutrition" style="min-height:80px;" placeholder="VD: Mỗi 100g: 32 kcal · Carbs 7.7g ...">{{ old('nutrition') }}</textarea>
+            </div>
           </div>
         </div>
       </div>
@@ -207,6 +211,14 @@
               </div>
               <button type="button" class="toggle on" onclick="this.classList.toggle('on')"></button>
             </div>
+            <div class="flex justify-between items-center">
+              <div>
+                <div style="font-size:.85rem;font-weight:600;">Bán trong ngày</div>
+                <div style="font-size:.72rem;color:var(--text-3);">Hiển thị trong mục "Bán trong ngày"</div>
+              </div>
+              <input type="hidden" name="is_daily" id="isDailyInput" value="0">
+              <button type="button" id="isDailyToggle" class="toggle" onclick="toggleIsDaily()"></button>
+            </div>
           </div>
         </div>
       </div>
@@ -319,11 +331,12 @@
 
   // Visual drag-and-drop feedback & form submit handler
   document.addEventListener('DOMContentLoaded', () => {
-    // Khởi tạo CKEditor cho phần mô tả
-    const descTextarea = document.querySelector('textarea[name="desc"]');
-    if (descTextarea) {
+    // Khởi tạo CKEditor
+    const initCKEditor = (selector) => {
+      const el = document.querySelector(selector);
+      if (!el) return;
       ClassicEditor
-        .create(descTextarea, {
+        .create(el, {
           toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'outdent', 'indent', '|', 'blockQuote', 'undo', 'redo' ]
         })
         .then(editor => {
@@ -357,7 +370,10 @@
         .catch(error => {
           console.error(error);
         });
-    }
+    };
+
+    initCKEditor('textarea[name="desc"]');
+    initCKEditor('textarea[name="nutrition"]');
 
     const subArea = document.getElementById('sub-images-upload-area');
     const subInput = document.getElementById('subImagesInput');
@@ -474,6 +490,18 @@
     if (wrap) wrap.style.display = 'none';
     if (iframe) iframe.src = '';
     if (invalid) invalid.style.display = 'none';
+  }
+
+  function toggleIsDaily() {
+    const input = document.getElementById('isDailyInput');
+    const btn = document.getElementById('isDailyToggle');
+    if (input.value === '1') {
+      input.value = '0';
+      btn.classList.remove('on');
+    } else {
+      input.value = '1';
+      btn.classList.add('on');
+    }
   }
 </script>
 @endpush
