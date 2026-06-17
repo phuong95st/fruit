@@ -35,7 +35,7 @@
         <option value="Hoàn hàng" {{ request('status') === 'Hoàn hàng' ? 'selected' : '' }}>Hoàn hàng</option>
         <option value="Đã hủy" {{ request('status') === 'Đã hủy' ? 'selected' : '' }}>Đã hủy</option>
       </select>
-      <button type="submit" class="btn btn-ghost btn-sm" style="border-radius:50px;">Lọc</button>
+      <button type="submit" class="btn btn-filter btn-sm" style="border-radius:50px;">Lọc</button>
       <div class="filter-bar-spacer"></div>
       <button type="button" class="btn-icon-square" onclick="location.href='{{ route('admin.orders') }}'">🔄</button>
     </form>

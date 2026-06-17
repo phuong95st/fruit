@@ -33,32 +33,61 @@
           </div>
         @endif
       </div>
+
+      {{-- VIDEO EMBED (ẩn mặc định, hiện khi chọn thumb video) --}}
+      @if($product->video)
+        <div id="det-video-wrap" style="display:none; margin-bottom:10px;">
+          @if($product->is_youtube)
+            {{-- YouTube iframe: 16:9 responsive --}}
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;">
+              <iframe id="det-video-iframe" src="" frameborder="0" allowfullscreen allow="autoplay"
+                style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:12px;"></iframe>
+            </div>
+          @else
+            <video id="det-video" src="{{ $product->video_url }}" controls
+              style="width:100%;border-radius:12px;background:#000;"></video>
+          @endif
+        </div>
+      @endif
+
+      {{-- THUMBNAIL GALLERY --}}
       <div class="detail-thumbs">
+        {{-- Ảnh chính luôn là thumb đầu tiên --}}
         @if($product->image_url)
-          <div class="detail-thumb on" onclick="selectThumb(this, 'image')">
+          <div class="detail-thumb on" onclick="selectThumbImg(this, '{{ $product->image_url }}')">
             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
           </div>
         @else
-          <div class="detail-thumb on" onclick="selectThumb(this, 'icon', '{{ $product->bg }}')">
+          <div class="detail-thumb on" onclick="selectThumbIcon(this, '{{ $product->bg }}')">
             <div class="fruit-ico {{ $product->ic }}"><svg viewBox="0 0 24 24">{!! $product->svg !!}</svg></div>
           </div>
         @endif
-        
-        <div class="detail-thumb" onclick="selectThumb(this, 'mock1', 'bg-g')">
-          @if($product->image_url)
-            <img src="{{ $product->image_url }}" alt="Sub Image 1" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.7; border-radius: inherit;">
+
+        {{-- Ảnh phụ từ DB --}}
+        @foreach($product->images_urls as $subUrl)
+          <div class="detail-thumb" onclick="selectThumbImg(this, '{{ $subUrl }}')">
+            <img src="{{ $subUrl }}" alt="Ảnh phụ" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
+          </div>
+        @endforeach
+
+        {{-- Thumb video nếu có --}}
+        @if($product->video)
+          @if($product->is_youtube)
+            <div class="detail-thumb" onclick="selectThumbVideo(this, '{{ $product->video_embed_url }}')" style="position:relative;background:#111;">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                <div style="width:28px;height:28px;background:#f00;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#fff;"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+              </div>
+            </div>
           @else
-            <div class="fruit-ico fi-g" style="background:var(--n50)"><svg viewBox="0 0 24 24"><path d="M12 22s8-6 8-12A8 8 0 004 10c0 6 8 12 8 12z"/></svg></div>
+            <div class="detail-thumb" onclick="selectThumbVideo(this, '{{ $product->video_url }}')" style="position:relative;background:#111;">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🎬</div>
+            </div>
           @endif
-        </div>
-        <div class="detail-thumb" onclick="selectThumb(this, 'mock2', 'bg-g')">
-          @if($product->image_url)
-            <img src="{{ $product->image_url }}" alt="Sub Image 2" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5; border-radius: inherit;">
-          @else
-            <div class="fruit-ico fi-g" style="background:#f0f8f0"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/></svg></div>
-          @endif
-        </div>
+        @endif
       </div>
+
     </div>
     
     <!-- Right Column: Product details info -->
@@ -85,7 +114,7 @@
         @endif
       </div>
       
-      <p style="font-size:var(--fs-base);color:var(--n700);line-height:1.6;margin-bottom:8px;">{{ $product->desc }}</p>
+      <div style="font-size:var(--fs-base);color:var(--n700);line-height:1.6;margin-bottom:8px;">{!! $product->desc !!}</div>
       
       <div class="detail-attrs">
         <div class="attr-row"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2M8 21V7"/></svg><div><div class="attr-lbl">Quy cách</div><div class="attr-val">{{ $product->pack }}</div></div></div>
@@ -126,7 +155,7 @@
           <button class="tab-btn" onclick="switchTab(this,'t-reviews')">Đánh giá ({{ $product->reviews_count }})</button>
         </div>
         <div class="tab-panel on" id="t-desc">
-          <p>{{ $product->desc ?: 'Thông tin mô tả sản phẩm đang được cập nhật.' }}</p>
+          <div>{!! $product->desc ?: 'Thông tin mô tả sản phẩm đang được cập nhật.' !!}</div>
         </div>
         <div class="tab-panel" id="t-nutri">
           <p>{!! $product->nutrition ?: 'Mỗi 100g chứa nhiều vitamin, chất xơ và khoáng chất cần thiết. Rất tốt cho sức khỏe.' !!}</p>
@@ -306,27 +335,68 @@
         document.getElementById('qtyNum').textContent = curQty;
     }
     
-    function selectThumb(thumb, type, bgClass) {
+    // ===== GALLERY NAVIGATION =====
+    function selectThumbImg(thumb, imgUrl) {
         document.querySelectorAll('.detail-thumb').forEach(t => t.classList.remove('on'));
         thumb.classList.add('on');
-        
+
+        // Ẩn video nếu đang hiện
+        const videoWrap = document.getElementById('det-video-wrap');
         const main = document.getElementById('det-main');
-        const img = document.getElementById('det-main-img');
-        const icon = document.getElementById('det-icon');
-        
-        if (type === 'image') {
-            if (img) img.style.opacity = '1';
-            main.className = 'detail-img-main';
-        } else if (type === 'mock1') {
-            if (img) img.style.opacity = '0.7';
-            main.className = 'detail-img-main';
-        } else if (type === 'mock2') {
-            if (img) img.style.opacity = '0.5';
-            main.className = 'detail-img-main';
-        } else {
-            if (img) img.style.opacity = '0';
-            main.className = 'detail-img-main ' + bgClass;
+        if (videoWrap) videoWrap.style.display = 'none';
+        main.style.display = '';
+
+        // Hiển thị ảnh
+        let img = document.getElementById('det-main-img');
+        if (!img) {
+            img = document.createElement('img');
+            img.id = 'det-main-img';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit;';
+            main.innerHTML = '';
+            main.appendChild(img);
         }
+        img.src = imgUrl;
+        img.style.opacity = '1';
+    }
+
+    function selectThumbIcon(thumb, bgClass) {
+        document.querySelectorAll('.detail-thumb').forEach(t => t.classList.remove('on'));
+        thumb.classList.add('on');
+        const videoWrap = document.getElementById('det-video-wrap');
+        const main = document.getElementById('det-main');
+        if (videoWrap) videoWrap.style.display = 'none';
+        main.style.display = '';
+        main.className = 'detail-img-main ' + bgClass;
+        const img = document.getElementById('det-main-img');
+        if (img) img.style.opacity = '0';
+    }
+
+    function selectThumbVideo(thumb, videoUrl) {
+        document.querySelectorAll('.detail-thumb').forEach(t => t.classList.remove('on'));
+        thumb.classList.add('on');
+
+        // Ẩn ảnh main, hiện video wrap
+        const main = document.getElementById('det-main');
+        main.style.display = 'none';
+        const videoWrap = document.getElementById('det-video-wrap');
+        if (videoWrap) videoWrap.style.display = 'block';
+
+        // YouTube: cập nhật iframe src để autoplay
+        const iframe = document.getElementById('det-video-iframe');
+        if (iframe) {
+            iframe.src = videoUrl + '?autoplay=1&rel=0';
+            return;
+        }
+        // File video: cập nhật src và play
+        const video = document.getElementById('det-video');
+        if (video) { video.src = videoUrl; video.play(); }
+    }
+
+
+    // Legacy selectThumb (fallback nếu còn gọi)
+    function selectThumb(thumb, type, bgClass) {
+        if (type === 'image') selectThumbImg(thumb, document.getElementById('det-main-img')?.src || '');
+        else selectThumbIcon(thumb, bgClass || 'bg-g');
     }
     
     function switchTab(btn, tabId) {

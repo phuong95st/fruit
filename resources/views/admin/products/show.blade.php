@@ -75,6 +75,60 @@
           </div>
         </div>
       </div>
+
+    <!-- Media Gallery (Sub-images and Video) -->
+    <div class="card mb-16">
+      <div class="card-header">
+        <div class="card-title">🖼️ Thư viện ảnh & video chi tiết</div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <!-- Sub images list -->
+          @php $subImages = $product->images ?? []; @endphp
+          @if(count($subImages) > 0)
+            <div>
+              <div style="font-size:.85rem; font-weight:600; color:var(--text-2); margin-bottom:8px;">Hình ảnh phụ (tối đa 5 ảnh)</div>
+              <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                @foreach($product->images_urls as $subUrl)
+                  <div style="width:100px; height:100px; border-radius:var(--r-md); border:1px solid var(--border); overflow:hidden; cursor:pointer;" onclick="window.open('{{ $subUrl }}', '_blank')">
+                    <img src="{{ $subUrl }}" alt="Ảnh phụ" style="width:100%; height:100%; object-fit:cover; transition: transform .2s;" onmouseenter="this.style.transform='scale(1.05)'" onmouseleave="this.style.transform='scale(1)'">
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          @else
+            <div style="font-size:.82rem; color:var(--text-3);">Không có ảnh phụ cho sản phẩm này.</div>
+          @endif
+
+          <!-- Video section -->
+          @if($product->video)
+            <div style="border-top:1px solid var(--border); padding-top:16px;">
+              <div style="font-size:.85rem; font-weight:600; color:var(--text-2); margin-bottom:8px;">Video sản phẩm</div>
+              <div style="max-width:400px; border-radius:var(--r-md); overflow:hidden; border:1px solid var(--border); background:#000;">
+                @if($product->is_youtube)
+                  {{-- YouTube embed --}}
+                  <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+                    <iframe src="{{ $product->video_embed_url }}?rel=0"
+                      style="position:absolute; top:0; left:0; width:100%; height:100%;"
+                      frameborder="0" allowfullscreen loading="lazy"></iframe>
+                  </div>
+                  <div style="padding:8px 12px; background:var(--bg); font-size:.78rem; display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:.7rem; background:rgba(255,0,0,.1); color:#c00; border-radius:50px; padding:2px 8px; font-weight:700;">▶ YouTube</span>
+                    <a href="{{ $product->video }}" target="_blank" style="color:var(--g-dark); text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">{{ $product->video }}</a>
+                  </div>
+                @else
+                  {{-- Direct video upload --}}
+                  <video src="{{ $product->video_url }}" controls style="width:100%; display:block; max-height:250px;"></video>
+                  <div style="padding:8px 12px; background:var(--bg); font-size:.78rem; display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:.7rem; background:rgba(76,175,128,.1); color:var(--g-mid); border-radius:50px; padding:2px 8px; font-weight:700;">📁 File</span>
+                    <span style="color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">{{ basename($product->video) }}</span>
+                  </div>
+                @endif
+              </div>
+            </div>
+          @endif
+        </div>
+      </div>
     </div>
 
     <!-- Sales chart -->
@@ -168,16 +222,20 @@
       <button class="modal-close" onclick="closeModal('modal-delete-product')">✕</button>
     </div>
     <div style="text-align:center;padding:20px 0;">
-      <div style="font-size:3rem;margin-bottom:12px;">🍊</div>
+      <div style="font-size:3rem;margin-bottom:12px;">⚠️</div>
       <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--g-dark);margin-bottom:6px;">{{ $product->name }}</div>
       <div style="font-size:.82rem;color:var(--text-3);">SKU: FN-{{ Str::upper(Str::substr($product->code, 0, 3)) }}-00{{ $product->id }}</div>
     </div>
     <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:var(--r-md);padding:12px;margin-bottom:16px;font-size:.82rem;color:var(--red);">
-      ⚠️ Hành động này không thể hoàn tác. Sản phẩm sẽ bị xóa khỏi hệ thống.
+      ⚠️ Sản phẩm sẽ bị ẩn khỏi hệ thống (xóa mềm). Có thể khôi phục lại trong tương lai.
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-ghost" onclick="closeModal('modal-delete-product')">Hủy bỏ</button>
-      <button type="button" class="btn btn-danger" onclick="closeModal('modal-delete-product');location.href='{{ route('admin.products') }}';showToast('🗑️ Đã xóa sản phẩm','error')">Xóa vĩnh viễn</button>
+      <form method="POST" action="{{ route('admin.products.destroy', $product->id) }}" style="display:inline;">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger">🗑️ Xóa sản phẩm</button>
+      </form>
     </div>
   </div>
 </div>

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'slug',
         'code',
@@ -31,6 +34,12 @@ class Product extends Model
         'nutrition',
         'is_daily',
         'image',
+        'images',
+        'video',
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
 
     /**
@@ -74,6 +83,71 @@ class Product extends Model
         }
         return null;
     }
+
+    /**
+     * Lấy danh sách URL các ảnh phụ
+     */
+    public function getImagesUrlsAttribute()
+    {
+        if (empty($this->images)) return [];
+        $baseUrl = rtrim(config('filesystems.disks.s3.url'), '/');
+        return array_map(function ($path) use ($baseUrl) {
+            if (filter_var($path, FILTER_VALIDATE_URL)) return $path;
+            return $baseUrl . '/' . ltrim($path, '/');
+        }, $this->images);
+    }
+
+    /**
+     * Kiểm tra video có phải YouTube / YouTube Shorts không
+     */
+    public function getIsYoutubeAttribute(): bool
+    {
+        return $this->video && (
+            str_contains($this->video, 'youtube.com') ||
+            str_contains($this->video, 'youtu.be')
+        );
+    }
+
+    /**
+     * Trả về URL trực tiếp của video (file upload hoặc URL gốc YouTube).
+     */
+    public function getVideoUrlAttribute(): ?string
+    {
+        if (!$this->video) return null;
+        // YouTube / Shorts — trả nguyên URL gốc
+        if ($this->is_youtube) return $this->video;
+        // File path — ghép S3 base URL
+        if (filter_var($this->video, FILTER_VALIDATE_URL)) return $this->video;
+        return rtrim(config('filesystems.disks.s3.url'), '/') . '/' . ltrim($this->video, '/');
+    }
+
+    /**
+     * Trả về URL embed chuẩn để nhúng vào <iframe>.
+     * - youtube.com/watch?v=ID   → youtube.com/embed/ID
+     * - youtu.be/ID              → youtube.com/embed/ID
+     * - youtube.com/shorts/ID    → youtube.com/embed/ID
+     * - File video               → null (dùng <video> tag thay thế)
+     */
+    public function getVideoEmbedUrlAttribute(): ?string
+    {
+        if (!$this->video) return null;
+
+        // Shorts: youtube.com/shorts/ID
+        if (preg_match('/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/', $this->video, $m)) {
+            return 'https://www.youtube.com/embed/' . $m[1];
+        }
+        // Watch: youtube.com/watch?v=ID
+        if (preg_match('/youtube\.com\/watch\?(?:.*&)?v=([a-zA-Z0-9_-]+)/', $this->video, $m)) {
+            return 'https://www.youtube.com/embed/' . $m[1];
+        }
+        // Short link: youtu.be/ID
+        if (preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $this->video, $m)) {
+            return 'https://www.youtube.com/embed/' . $m[1];
+        }
+
+        return null; // Không phải YouTube → dùng <video>
+    }
+
 
     /**
      * Sinh dữ liệu cấu trúc JSON-LD chuẩn SEO cho AI & Google Search

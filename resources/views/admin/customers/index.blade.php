@@ -36,7 +36,7 @@
   <div class="card-body">
     <form method="GET" action="{{ route('admin.customers') }}" class="filter-bar">
       <input type="text" name="search" placeholder="🔍 Tìm tên, SĐT, email..." value="{{ request('search') }}" style="min-width:220px;"/>
-      <button type="submit" class="btn btn-ghost btn-sm" style="border-radius:50px;">Tìm kiếm</button>
+      <button type="submit" class="btn btn-filter btn-sm" style="border-radius:50px;">Tìm kiếm</button>
       <div class="filter-bar-spacer"></div>
     </form>
     

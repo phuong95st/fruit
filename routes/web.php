@@ -120,10 +120,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     
     Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
     Route::get('/products/create', [AdminController::class, 'productCreate'])->name('admin.products.create');
+    Route::get('/products/export', [AdminController::class, 'productExport'])->name('admin.products.export');
+    Route::post('/products/import', [AdminController::class, 'productImport'])->name('admin.products.import');
+    Route::get('/products/import-template', [AdminController::class, 'productImportTemplate'])->name('admin.products.import-template');
     Route::post('/products', [AdminController::class, 'productStore'])->name('admin.products.store');
     Route::get('/products/{id}', [AdminController::class, 'productDetail'])->name('admin.products.detail');
     Route::get('/products/{id}/edit', [AdminController::class, 'productEdit'])->name('admin.products.edit');
     Route::post('/products/{id}/update', [AdminController::class, 'productUpdate'])->name('admin.products.update');
+    Route::delete('/products/{id}', [AdminController::class, 'productDestroy'])->name('admin.products.destroy');
     Route::post('/products/{id}/toggle-daily', [AdminController::class, 'toggleDaily'])->name('admin.products.toggle-daily');
     
     Route::get('/inventory', [AdminController::class, 'inventory'])->name('admin.inventory');
