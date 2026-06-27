@@ -314,11 +314,50 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Hoa quả Sơn Tây. Bảo lưu mọi quyền.</span>
-      <span>Thanh toán: ATM · Thẻ ngân hàng · Tiền mặt (COD)</span>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span>© 2026 Hoa quả Sơn Tây. Bảo lưu mọi quyền.</span>
+        <span>Thanh toán: ATM · Thẻ ngân hàng · Tiền mặt (COD)</span>
+      </div>
+      <div style="flex-shrink: 0; margin-top: 5px;">
+        <a href="http://online.gov.vn/" target="_blank" rel="noopener noreferrer" style="display: inline-block;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 57" width="110" height="42" style="display: block;">
+            <rect width="150" height="57" rx="6" fill="#1b5a9e" />
+            <circle cx="28" cy="28.5" r="18" fill="#fff" />
+            <circle cx="28" cy="28.5" r="15" fill="#d21f26" />
+            <path d="M28 20.5 L30.5 25.5 L36 26 L32 29.5 L33.2 35 L28 32 L22.8 35 L24 29.5 L20 26 L25.5 25.5 Z" fill="#fff900" />
+            <text x="54" y="26" fill="#fff" font-family="'Source Sans 3', sans-serif, Arial" font-size="11" font-weight="900" letter-spacing="0.5">ĐÃ ĐĂNG KÝ</text>
+            <text x="54" y="40" fill="#fff" font-family="'Source Sans 3', sans-serif, Arial" font-size="9" font-weight="700" letter-spacing="0.5">BỘ CÔNG THƯƠNG</text>
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
 </footer>
+
+<!-- Mobile Bottom Navigation -->
+<div class="mobile-nav">
+  <a href="{{ route('home') }}" class="mobile-nav-item {{ request()->routeIs('home') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    <span>Trang chủ</span>
+  </a>
+  <a href="{{ route('shop.index') }}" class="mobile-nav-item {{ request()->routeIs('shop.index') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>Cửa hàng</span>
+  </a>
+  <a href="{{ route('cart.index') }}" class="mobile-nav-item {{ request()->routeIs('cart.index') ? 'active' : '' }}" style="position:relative;">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+    <span class="mobile-cart-badge" id="mobileCartBadge">{{ array_sum(array_column(session('cart', []), 'quantity')) }}</span>
+    <span>Giỏ hàng</span>
+  </a>
+  <a href="{{ route('page.orders') }}" class="mobile-nav-item {{ request()->routeIs('page.orders') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span>Đơn hàng</span>
+  </a>
+  <a href="{{ route('page.auth') }}" class="mobile-nav-item {{ request()->routeIs('page.auth') || request()->routeIs('page.profile') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Cá nhân</span>
+  </a>
+</div>
 
 <!-- Toast notification box -->
 <div class="toast" id="toast"></div>
@@ -357,6 +396,16 @@
             showToast("{{ session('error') }}");
         });
     @endif
+    // Keep mobileCartBadge in sync if cartBadge is modified
+    const cartBadge = document.getElementById('cartBadge');
+    const mobileCartBadge = document.getElementById('mobileCartBadge');
+    if (cartBadge && mobileCartBadge) {
+        mobileCartBadge.textContent = cartBadge.textContent;
+        const observer = new MutationObserver(() => {
+            mobileCartBadge.textContent = cartBadge.textContent;
+        });
+        observer.observe(cartBadge, { childList: true, characterData: true, subtree: true });
+    }
 </script>
 
 @yield('scripts')

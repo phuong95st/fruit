@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -196,67 +197,76 @@ class AuthController extends Controller
     }
 
     /**
-     * Giả lập trang đăng nhập Google
+     * Chuyển hướng sang trang đăng nhập Google thực tế
      */
     public function redirectToGoogle()
     {
-        return view('auth.social-consent', ['provider' => 'Google']);
-    }
-
-    /**
-     * Giả lập callback đăng nhập Google
-     */
-    public function handleGoogleCallback(Request $request)
-    {
-        $email = $request->input('email', 'google.user@gmail.com');
-        $name = $request->input('name', 'Khách hàng Google');
-
-        // Tìm hoặc tạo mới người dùng
-        $user = User::where('email', $email)->first();
-        if (!$user) {
-            $user = User::create([
-                'name' => $name,
-                'email' => $email,
-                'password' => Hash::make(Str::random(24)),
-                'email_verified_at' => Carbon::now(),
+        try {
+            \Illuminate\Support\Facades\Log::info('Google login redirect initiated.');
+            return Socialite::driver('google')->redirect();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Google Redirect Error: ' . $e->getMessage(), [
+                'exception' => $e
             ]);
+            return redirect()->route('page.auth')->with('error', 'Cấu hình đăng nhập bằng Google không hợp lệ hoặc thiếu: ' . $e->getMessage());
         }
-
-        Auth::login($user);
-
-        return redirect()->route('page.auth')->with('success', 'Đăng nhập bằng Google thành công!');
     }
 
     /**
-     * Giả lập trang đăng nhập Facebook
+     * Xử lý callback từ Google thực tế
+     */
+    public function handleGoogleCallback()
+    {
+        try {
+            \Illuminate\Support\Facades\Log::info('Google callback received.', ['request_params' => request()->all()]);
+            $googleUser = Socialite::driver('google')->user();
+            
+            $email = $googleUser->getEmail();
+            $name = $googleUser->getName();
+            $avatar = $googleUser->getAvatar();
+
+            // Tìm hoặc tạo mới người dùng
+            $user = User::where('email', $email)->first();
+            if (!$user) {
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => Hash::make(Str::random(24)),
+                    'email_verified_at' => Carbon::now(),
+                    'avatar' => $avatar,
+                ]);
+            } else {
+                // Cập nhật avatar nếu có đổi mới
+                if ($avatar && $user->avatar !== $avatar) {
+                    $user->update(['avatar' => $avatar]);
+                }
+            }
+
+            Auth::login($user);
+
+            return redirect()->route('page.auth')->with('success', 'Đăng nhập bằng Google thành công!');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Google Login Error: ' . $e->getMessage(), [
+                'exception' => $e
+            ]);
+            return redirect()->route('page.auth')->with('error', 'Đăng nhập bằng Google thất bại: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Thông báo chưa cấu hình Facebook
      */
     public function redirectToFacebook()
     {
-        return view('auth.social-consent', ['provider' => 'Facebook']);
+        return redirect()->route('page.auth')->with('error', 'Tính năng đăng nhập bằng Facebook chưa được cấu hình.');
     }
 
     /**
-     * Giả lập callback đăng nhập Facebook
+     * Callback Facebook
      */
-    public function handleFacebookCallback(Request $request)
+    public function handleFacebookCallback()
     {
-        $email = $request->input('email', 'facebook.user@gmail.com');
-        $name = $request->input('name', 'Khách hàng Facebook');
-
-        // Tìm hoặc tạo mới người dùng
-        $user = User::where('email', $email)->first();
-        if (!$user) {
-            $user = User::create([
-                'name' => $name,
-                'email' => $email,
-                'password' => Hash::make(Str::random(24)),
-                'email_verified_at' => Carbon::now(),
-            ]);
-        }
-
-        Auth::login($user);
-
-        return redirect()->route('page.auth')->with('success', 'Đăng nhập bằng Facebook thành công!');
+        return redirect()->route('page.auth')->with('error', 'Tính năng đăng nhập bằng Facebook chưa được cấu hình.');
     }
 
     /**
