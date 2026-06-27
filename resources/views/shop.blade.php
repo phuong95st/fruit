@@ -122,7 +122,7 @@
              <a href="{{ route('shop.index') }}" class="btn btn-primary" style="margin-top:10px;">Xóa bộ lọc</a>
           </div>
         @else
-          <div class="grid-4" id="shop-grid">
+          <div class="grid-5" id="shop-grid">
             @foreach($products as $product)
               @include('partials.product-card', ['product' => $product])
             @endforeach

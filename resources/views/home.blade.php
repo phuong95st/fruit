@@ -71,14 +71,14 @@
     <!-- Main content -->
     <div>
       <!-- Hôm nay bán gì? -->
-      <div class="section-block" style="background: rgba(76, 175, 128, 0.05); border: 1px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+      <div class="section-block">
         <div class="section-head">
-          <div class="section-head-title" style="color: var(--accent); display: flex; align-items: center; gap: 8px;">
+          <div class="section-head-title">
             <span style="font-size: 1.5rem;">🧺</span> Hôm nay bán gì?
           </div>
           <span style="font-size: 0.85rem; color: var(--text-3); font-weight: 500; background: var(--white); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.05);">Tuyển chọn hái tươi mỗi ngày</span>
         </div>
-        <div class="section-body" style="margin-top: 15px;">
+        <div class="section-body">
           @if($dailyProducts->count() > 0)
             <div class="grid-5" id="home-daily">
               @foreach($dailyProducts as $product)
@@ -147,7 +147,7 @@
           <a class="section-head-link" href="{{ route('shop.index', ['categories[]' => 'Giỏ quà']) }}">Xem tất cả »</a>
         </div>
         <div class="section-body">
-          <div class="grid-4" id="home-baskets">
+          <div class="grid-5" id="home-baskets">
             @foreach($baskets as $product)
               @include('partials.product-card', ['product' => $product])
             @endforeach
