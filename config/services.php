@@ -44,4 +44,25 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Scraper Store URLs Configuration
+    |--------------------------------------------------------------------------
+    */
+    'scraper' => [
+        'fujifruit' => array_filter(explode(',', env('SCRAPER_FUJIFRUIT_URLS', 'https://fujifruit.com.vn/danh-muc/hoa-qua-nhap-khau/'))),
+        'tamfruit' => array_filter(explode(',', env('SCRAPER_TAMFRUIT_URLS', 'https://tamfruit.vn/trai-cay-nhap-khau/'))),
+        'delifruit' => array_filter(explode(',', env('SCRAPER_DELIFRUIT_URLS', 'https://delifruit.vn/trai-cay-nhap-khau'))),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Gemini AI API Configuration
+    |--------------------------------------------------------------------------
+    */
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY', ''),
+        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
+    ],
+
 ];

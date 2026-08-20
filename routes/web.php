@@ -141,4 +141,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/vouchers', [AdminController::class, 'voucherStore'])->name('admin.vouchers.store');
     
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+
+    // Gemini AI Price Analysis Endpoints
+    Route::get('/ai-price-analysis', [AdminController::class, 'getAiPriceAnalysis'])->name('admin.ai-price-analysis');
+    Route::post('/run-ai-price-analysis', [AdminController::class, 'runAiPriceAnalysis'])->name('admin.run-ai-price-analysis');
+    Route::post('/apply-ai-prices', [AdminController::class, 'applyAiPrices'])->name('admin.apply-ai-prices');
 });
