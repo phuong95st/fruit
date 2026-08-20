@@ -43,7 +43,7 @@ class ProductImageUploadTest extends TestCase
         // Check image URL structure
         $url = $product->image_url;
         $this->assertNotNull($url);
-        $this->assertStringContainsString('http://127.0.0.1:9000/fruit/products/', $url);
+        $this->assertStringContainsString('http://192.168.170.14:9000/fruit/products/', $url);
 
         // Delete test file
         Storage::disk('s3')->delete($product->image);

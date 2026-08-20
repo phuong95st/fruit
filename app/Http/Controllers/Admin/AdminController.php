@@ -1031,4 +1031,67 @@ class AdminController extends Controller
         }
         @rmdir($dirPath);
     }
+
+
+    /**
+     * Lấy báo cáo phân tích giá Gemini AI mới nhất
+     */
+    public function getAiPriceAnalysis(\App\Services\GeminiPriceAnalyzerService $analyzerService)
+    {
+        $analysis = $analyzerService->getLatestAnalysis();
+        if (!$analysis) {
+            return response()->json(['success' => false, 'message' => 'Chưa có dữ liệu phân tích AI ngày hôm nay.']);
+        }
+        return response()->json(['success' => true, 'data' => $analysis]);
+    }
+
+    /**
+     * Kích hoạt chạy phân tích giá Gemini AI ngay lập tức từ Admin Dashboard
+     */
+    public function runAiPriceAnalysis(\App\Services\GeminiPriceAnalyzerService $analyzerService)
+    {
+        @set_time_limit(300);
+        @ini_set("max_execution_time", "300");
+        try {
+            $analysis = $analyzerService->analyzeSingleProducts();
+            return response()->json(['success' => true, 'message' => 'Đã chạy phân tích giá Gemini AI thành công!', 'data' => $analysis]);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Lỗi khi chạy phân tích AI: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Áp dụng giá đề xuất (có cho phép người dùng chỉnh sửa thủ công) vào bảng products trong MySQL DB
+     */
+    public function applyAiPrices(Request $request)
+    {
+        $prices = $request->input('prices', []);
+
+        if (empty($prices) || !is_array($prices)) {
+            return response()->json(['success' => false, 'message' => 'Dữ liệu giá gửi lên không hợp lệ.'], 400);
+        }
+
+        $updatedCount = 0;
+
+        foreach ($prices as $item) {
+            $productId = $item['id'] ?? null;
+            $newPrice = (float)($item['new_price'] ?? 0);
+
+            if ($productId && $newPrice > 0) {
+                $product = Product::find($productId);
+                if ($product) {
+                    $product->original_price = $product->price;
+                    $product->price = $newPrice;
+                    $product->save();
+                    $updatedCount++;
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Đã áp dụng giá mới thành công cho {$updatedCount} sản phẩm vào Database!",
+            'updated_count' => $updatedCount
+        ]);
+    }
 }
