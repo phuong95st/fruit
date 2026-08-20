@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Voucher;
 use App\Models\StockIn;
 use App\Models\StockInItem;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -543,7 +544,7 @@ class AdminController extends Controller
     // Chi tiết sản phẩm
     public function productDetail($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::withTrashed()->findOrFail($id);
         return view('admin.products.show', compact('product'));
     }
 
@@ -676,14 +677,14 @@ class AdminController extends Controller
     // Sửa sản phẩm (Form)
     public function productEdit($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::withTrashed()->findOrFail($id);
         return view('admin.products.edit', compact('product'));
     }
 
     // Cập nhật sản phẩm
     public function productUpdate(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::withTrashed()->findOrFail($id);
 
         $request->validate([
             'name'            => 'required|string|max:255',
@@ -749,6 +750,15 @@ class AdminController extends Controller
             'images'         => count($allImages) > 0 ? $allImages : null,
             'video'          => $videoPath,
         ]);
+
+        // Cập nhật trạng thái hiển thị trên Web (Ẩn / Khôi phục)
+        if ($request->has('is_active')) {
+            if ($request->input('is_active') == '1' && $product->trashed()) {
+                $product->restore();
+            } elseif ($request->input('is_active') == '0' && !$product->trashed()) {
+                $product->delete();
+            }
+        }
 
         return redirect()->route('admin.products.detail', $product->id)->with('success', 'Đã cập nhật sản phẩm thành công');
     }
@@ -1017,6 +1027,111 @@ class AdminController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Màn hình Quản Trị Zalo Bot Trợ Lý (Bảo mật bằng Master PIN)
+     */
+    public function zaloAssistant()
+    {
+        $isUnlocked = session('zalo_super_admin_unlocked', false);
+        $adminPhones = User::where('is_admin', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['name', 'email', 'phone']);
+        return view('admin.zalo_assistant', compact('isUnlocked', 'adminPhones'));
+    }
+
+    /**
+     * Xác thực Master PIN mở khóa giao diện Quản trị Zalo
+     */
+    public function verifyZaloPin(Request $request)
+    {
+        $inputPin = trim((string)$request->input('pin', ''));
+        $expectedPin = env('ZALO_MASTER_PIN', '9999');
+
+        if ($inputPin === (string)$expectedPin) {
+            session(['zalo_super_admin_unlocked' => true]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Xác thực mã PIN thành công!'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Mã PIN không chính xác. Vui lòng thử lại!'
+        ], 403);
+    }
+
+    /**
+     * Khóa lại màn hình Quản trị Zalo
+     */
+    public function lockZaloPin()
+    {
+        session()->forget('zalo_super_admin_unlocked');
+        return response()->json(['success' => true, 'message' => 'Đã khóa màn hình Quản trị.']);
+    }
+
+    /**
+     * Yêu cầu NodeJS Gateway tạo mã QR mới
+     */
+    public function requestZaloQr()
+    {
+        if (!session('zalo_super_admin_unlocked', false)) {
+            return response()->json(['success' => false, 'message' => 'Vui lòng mở khóa bằng mã PIN trước.'], 403);
+        }
+
+        $gatewayUrl = env('ZALO_GATEWAY_API_URL', 'http://127.0.0.1:3001');
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(10)->post("{$gatewayUrl}/api/generate-qr");
+            return response()->json($response->json());
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể kết nối đến Zalo Bot Gateway (Port 3001): ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Lấy trạng thái kết nối & QR Real-time từ NodeJS Gateway
+     */
+    public function getZaloStatus()
+    {
+        $gatewayUrl = env('ZALO_GATEWAY_API_URL', 'http://127.0.0.1:3001');
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(3)->get("{$gatewayUrl}/api/status");
+            return response()->json($response->json());
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'is_connected' => false,
+                'status' => 'offline',
+                'message' => 'Gateway chưa hoạt động hoặc chưa khởi động'
+            ]);
+        }
+    }
+
+    /**
+     * Ngắt kết nối / Đăng xuất Nick Trợ lý Zalo cũ
+     */
+    public function disconnectZalo()
+    {
+        if (!session('zalo_super_admin_unlocked', false)) {
+            return response()->json(['success' => false, 'message' => 'Vui lòng mở khóa bằng mã PIN trước.'], 403);
+        }
+
+        $gatewayUrl = env('ZALO_GATEWAY_API_URL', 'http://127.0.0.1:3001');
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->post("{$gatewayUrl}/api/disconnect");
+            return response()->json($response->json());
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi kết nối Gateway: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

@@ -270,7 +270,8 @@
                 <div style="font-size:.85rem;font-weight:600;">Hiển thị trên web</div>
                 <div style="font-size:.72rem;color:var(--text-3);">Khách hàng thấy sản phẩm</div>
               </div>
-              <button type="button" class="toggle on" onclick="this.classList.toggle('on')"></button>
+              <input type="hidden" name="is_active" id="isActiveInput" value="{{ $product->trashed() ? '0' : '1' }}">
+              <button type="button" id="isActiveToggle" class="toggle {{ $product->trashed() ? '' : 'on' }}" onclick="toggleIsActive()"></button>
             </div>
             <div class="flex justify-between items-center">
               <div>
@@ -609,6 +610,18 @@
     if (wrap) wrap.style.display = 'none';
     if (iframe) iframe.src = '';
     if (invalid) invalid.style.display = 'none';
+  }
+
+  function toggleIsActive() {
+    const input = document.getElementById('isActiveInput');
+    const btn = document.getElementById('isActiveToggle');
+    if (input.value === '1') {
+      input.value = '0';
+      btn.classList.remove('on');
+    } else {
+      input.value = '1';
+      btn.classList.add('on');
+    }
   }
 
   function toggleIsDaily() {

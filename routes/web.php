@@ -109,12 +109,25 @@ Route::get('/sitemap.xml', function () {
 });
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Api\ZaloBotController;
+
+// Webhook tiếp nhận tin nhắn từ Zalo Bot Gateway (NodeJS)
+Route::post('/api/zalo/webhook', [ZaloBotController::class, 'webhook'])->name('api.zalo.webhook');
+Route::get('/api/zalo/admin-phone', [ZaloBotController::class, 'getAdminPhone'])->name('api.zalo.admin-phone');
 
 // Admin Panel Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
     
+    // Quản trị Zalo Bot Trợ Lý (Bảo mật bằng Master PIN)
+    Route::get('/zalo-assistant', [AdminController::class, 'zaloAssistant'])->name('admin.zalo-assistant');
+    Route::post('/zalo-assistant/verify-pin', [AdminController::class, 'verifyZaloPin'])->name('admin.zalo-assistant.verify-pin');
+    Route::post('/zalo-assistant/lock', [AdminController::class, 'lockZaloPin'])->name('admin.zalo-assistant.lock');
+    Route::post('/zalo-assistant/generate-qr', [AdminController::class, 'requestZaloQr'])->name('admin.zalo-assistant.generate-qr');
+    Route::get('/zalo-assistant/status', [AdminController::class, 'getZaloStatus'])->name('admin.zalo-assistant.status');
+    Route::post('/zalo-assistant/disconnect', [AdminController::class, 'disconnectZalo'])->name('admin.zalo-assistant.disconnect');
+
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
     Route::get('/orders/{id}', [AdminController::class, 'orderDetail'])->name('admin.orders.detail');
     

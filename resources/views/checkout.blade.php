@@ -14,7 +14,7 @@
     <span class="bc-cur">Đặt hàng</span>
   </div>
   
-  <form action="{{ route('checkout.place') }}" method="POST">
+  <form action="{{ route('checkout.place') }}" method="POST" onsubmit="const btn = this.querySelector('button[type=submit]'); if (btn) { btn.disabled = true; btn.innerText = '⏳ Đang xử lý đặt hàng...'; }">
     @csrf
     <div class="checkout-layout">
       <!-- Left Column: Order Forms -->
