@@ -204,7 +204,7 @@
     <div class="card">
       <div class="card-header"><div class="card-title">⚙️ Trạng thái</div></div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
-        <div class="flex justify-between items-center"><div><div style="font-size:.85rem;font-weight:600;">Hiển thị trên web</div></div><button class="toggle on" onclick="this.classList.toggle('on');showToast('Đã cập nhật trạng thái','success')"></button></div>
+        <div class="flex justify-between items-center"><div><div style="font-size:.85rem;font-weight:600;">Hiển thị trên web</div></div><button class="toggle {{ $product->trashed() ? '' : 'on' }}" onclick="this.classList.toggle('on');showToast('Đã cập nhật trạng thái','success')"></button></div>
         <div class="flex justify-between items-center"><div><div style="font-size:.85rem;font-weight:600;">Nổi bật trang chủ</div></div><button class="toggle on" onclick="this.classList.toggle('on');showToast('Đã cập nhật','success')"></button></div>
         <div class="flex justify-between items-center"><div><div style="font-size:.85rem;font-weight:600;">Bán trong ngày</div></div><button id="toggle-daily-btn" class="toggle {{ $product->is_daily ? 'on' : '' }}" onclick="toggleDaily({{ $product->id }})"></button></div>
         <button class="btn btn-danger w-full" style="margin-top:4px;" onclick="openModal('modal-delete-product')">🗑️ Xóa sản phẩm</button>

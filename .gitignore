@@ -14,6 +14,12 @@
 /.zed
 /auth.json
 /node_modules
+node_modules/
+zalo-bot-gateway/node_modules/
+zalo-bot-gateway/session.json
+zalo-bot-gateway/credentials.json
+zalo-bot-gateway/qr.png
+zalo-bot-gateway/.env
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot

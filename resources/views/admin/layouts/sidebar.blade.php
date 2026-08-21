@@ -45,6 +45,9 @@
   <div class="nav-item {{ Route::is('admin.vouchers*') ? 'active' : '' }}" onclick="location.href='{{ route('admin.vouchers') }}'">
     <span class="ni-icon">🎫</span> Khuyến mãi
   </div>
+  <div class="nav-item {{ Route::is('admin.zalo-assistant*') ? 'active' : '' }}" onclick="location.href='{{ route('admin.zalo-assistant') }}'">
+    <span class="ni-icon">🤖</span> Quản trị Zalo Bot
+  </div>
 </div>
 
 <div class="sidebar-section">

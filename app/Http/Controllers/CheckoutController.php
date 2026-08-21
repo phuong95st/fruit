@@ -124,6 +124,9 @@ class CheckoutController extends Controller
             ]);
         }
 
+        // 4. Gửi thông báo đơn hàng mới tức thì về Zalo của Chủ Shop (Admin)
+        \App\Services\ZaloNotificationService::sendOrderNotification($dbOrder, $cart);
+
         // Lưu thông tin đơn vừa đặt vào session để trang Success hiển thị
         session()->put('last_order', [
             'id' => $orderId,
